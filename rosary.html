@@ -6,7 +6,7 @@
   <title>가톨릭 손안의 묵주기도 (예비자·신자용)</title>
   
   <meta property="og:title" content="가톨릭 손안의 묵주기도">
-  <meta property="og:description" content="환희·빛·고통·영광 20단 완송 · 예비자를 위한 친절한 기도문 수록">
+  <meta property="og:description" content="환희·빛·고통·영광의 신비 5단 / 전 20단 완송 모드 지원">
   <meta property="og:type" content="website">
 
   <script src="https://cdn.tailwindcss.com"></script>
@@ -18,7 +18,7 @@
       font-family: 'Pretendard', sans-serif;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
-      padding-bottom: env(safe-area-inset-bottom, 16px);
+      padding-bottom: calc(85px + env(safe-area-inset-bottom, 16px));
     }
     .custom-scrollbar::-webkit-scrollbar {
       width: 5px;
@@ -30,450 +30,480 @@
     }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col justify-between">
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
 
   <!-- 상단 네비게이션 헤더 -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
     <div class="max-w-xl mx-auto px-4 py-2.5 flex items-center justify-between">
       <div class="flex items-center space-x-2">
-        <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold shadow-xs">
-          <i class="fa-solid fa-cross text-xs"></i>
+        <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold">
+          <i class="fa-solid fa-hands-praying"></i>
         </div>
         <div>
-          <h1 class="text-sm sm:text-base font-extrabold text-slate-900 leading-tight">가톨릭 손안의 묵주기도</h1>
-          <p class="text-[10px] text-blue-600 font-semibold" id="todayRecommendText">오늘의 권장 신비 불러오는 중...</p>
+          <h1 class="text-sm sm:text-base font-bold text-slate-900 leading-tight">가톨릭 손안의 묵주기도</h1>
+          <p class="text-[11px] text-slate-500">예비자 교리 및 매일 기도 도우미</p>
         </div>
       </div>
-
-      <div class="flex items-center space-x-1.5">
-        <button onclick="openGuideModal()" class="text-xs px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold rounded-lg transition-colors flex items-center gap-1">
-          <i class="fa-regular fa-circle-question"></i>
+      
+      <div class="flex items-center space-x-1 sm:space-x-1.5">
+        <button onclick="openGuideModal()" class="text-xs px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold transition-colors flex items-center gap-1">
+          <i class="fa-regular fa-circle-question text-[11px]"></i>
           <span>기도 방법</span>
         </button>
-        <button onclick="toggleModeView()" id="btnToggleMode" class="text-xs px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg transition-colors">
-          전체문
+        <button onclick="resetBeadProgress()" class="text-xs px-2 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg transition-colors font-medium" title="묵주 처음으로">
+          <i class="fa-solid fa-rotate-left"></i>
         </button>
       </div>
     </div>
 
-    <!-- 신비 선택 및 연속 20단 토글 바 -->
-    <div class="max-w-xl mx-auto px-3 py-2 bg-slate-50 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
-      <div class="flex items-center gap-1.5 flex-1 min-w-[200px]">
-        <span class="text-xs font-bold text-slate-700 shrink-0">신비 선택:</span>
-        <select id="selectMystery" onchange="onMysteryChange()" class="w-full text-xs font-bold p-1.5 px-2 bg-white border border-blue-200 rounded-lg text-blue-900 focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-2xs">
-          <option value="환희">환희의 신비 5단 (월, 토)</option>
-          <option value="빛">빛의 신비 5단 (목)</option>
-          <option value="고통">고통의 신비 5단 (화, 금)</option>
-          <option value="영광">영광의 신비 5단 (수, 일)</option>
-          <option value="전체">🌟 4대 신비 20단 연속 완송</option>
-        </select>
+    <!-- 신비 선택 탭 -->
+    <div class="max-w-xl mx-auto px-3 py-2 border-t border-slate-100 bg-slate-50/90">
+      <div class="grid grid-cols-5 gap-1 text-[11px] font-semibold text-center">
+        <button onclick="selectMystery('환희')" id="tab-환희" class="mystery-tab py-1.5 rounded-lg transition-all bg-indigo-600 text-white shadow-xs">환희(5단)</button>
+        <button onclick="selectMystery('빛')" id="tab-빛" class="mystery-tab py-1.5 rounded-lg transition-all bg-white text-slate-600 hover:bg-slate-200">빛(5단)</button>
+        <button onclick="selectMystery('고통')" id="tab-고통" class="mystery-tab py-1.5 rounded-lg transition-all bg-white text-slate-600 hover:bg-slate-200">고통(5단)</button>
+        <button onclick="selectMystery('영광')" id="tab-영광" class="mystery-tab py-1.5 rounded-lg transition-all bg-white text-slate-600 hover:bg-slate-200">영광(5단)</button>
+        <button onclick="selectMystery('전체20단')" id="tab-전체20단" class="mystery-tab py-1.5 rounded-lg transition-all bg-white text-indigo-700 hover:bg-indigo-50 border border-indigo-200">20단완송</button>
       </div>
 
-      <div class="flex items-center space-x-1">
-        <button onclick="adjustFontSize(-1)" class="w-7 h-7 rounded bg-white hover:bg-slate-200 border border-slate-200 text-[10px] font-bold text-slate-600 flex items-center justify-center">가-</button>
-        <button onclick="adjustFontSize(1)" class="w-7 h-7 rounded bg-white hover:bg-slate-200 border border-slate-200 text-[10px] font-bold text-slate-600 flex items-center justify-center">가+</button>
+      <div class="flex items-center justify-between mt-2 pt-1 border-t border-slate-200/50 text-[11px]">
+        <div class="text-slate-600 font-medium flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="todayMysteryRecommendation" class="text-indigo-950 font-bold">오늘 요일 추천: 환희의 신비</span>
+        </div>
+        <div class="flex items-center gap-1 bg-slate-200/70 p-0.5 rounded-lg">
+          <button id="viewBtnHand" onclick="switchViewMode('hand')" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-indigo-700 shadow-2xs">손안의 묵주</button>
+          <button id="viewBtnList" onclick="switchViewMode('list')" class="px-2 py-0.5 rounded-md text-[10px] font-bold text-slate-500 hover:text-slate-800">전체 기도문</button>
+        </div>
       </div>
     </div>
   </header>
 
-  <!-- 메인 뷰 컨테이너 -->
-  <main class="flex-1 max-w-xl w-full mx-auto p-3 sm:p-4 flex flex-col justify-between">
-    
-    <!-- [뷰 1] 손안의 터치 묵주 뷰 (기본) -->
-    <div id="rosaryTouchView" class="space-y-3 flex flex-col flex-1">
-      
-      <!-- 상단 단 바로가기 탭 (1단 ~ 5단) -->
-      <div class="grid grid-cols-6 gap-1 bg-white p-1.5 rounded-2xl border border-slate-200 shadow-2xs text-center text-xs font-bold" id="decadeQuickBar">
-        <button onclick="jumpToDecadeIndex(0)" id="quickBtn0" class="py-1 rounded-lg bg-blue-600 text-white transition-colors">시작</button>
-        <button onclick="jumpToDecadeIndex(1)" id="quickBtn1" class="py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">1단</button>
-        <button onclick="jumpToDecadeIndex(2)" id="quickBtn2" class="py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">2단</button>
-        <button onclick="jumpToDecadeIndex(3)" id="quickBtn3" class="py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">3단</button>
-        <button onclick="jumpToDecadeIndex(4)" id="quickBtn4" class="py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">4단</button>
-        <button onclick="jumpToDecadeIndex(5)" id="quickBtn5" class="py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">5단</button>
-      </div>
+  <!-- 메인 본문 -->
+  <main class="flex-1 max-w-xl w-full mx-auto p-3 sm:p-4 flex flex-col justify-start">
 
-      <!-- 메인 묵주알 & 기도문 카드 -->
-      <div class="bg-white rounded-3xl p-4 sm:p-5 border border-blue-100 shadow-sm flex flex-col items-center text-center flex-1 justify-between">
+    <!-- 손안의 묵주 모드 (기본) -->
+    <div id="rosaryHandView" class="space-y-3">
+
+      <div class="bg-white rounded-3xl p-4 sm:p-5 border border-indigo-100 shadow-md flex flex-col items-center text-center relative overflow-hidden">
         
-        <!-- 카드 상단 메타 바 -->
-        <div class="w-full flex items-center justify-between pb-2 border-b border-slate-100">
-          <span id="rosaryBeadBadge" class="text-xs font-bold px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 flex items-center gap-1.5">
-            <i class="fa-solid fa-cross"></i> 시작 십자가
+        <!-- 현재 단계 뱃지 & 알 카운터 -->
+        <div class="w-full flex items-center justify-between mb-2">
+          <span id="rosaryStepBadge" class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-700 flex items-center gap-1">
+            <i class="fa-solid fa-cross"></i> 십자가
           </span>
-          <span class="text-xs font-bold text-slate-400">
-            진행 <span id="currentBeadNumberText" class="text-blue-600 font-extrabold text-sm">1</span> / <span id="totalBeadNumberText">67</span>알
+          <span class="text-[11px] font-bold text-slate-400">
+            <span id="rosaryCurrentIdxText" class="text-indigo-600 font-extrabold text-xs">1</span> / <span id="rosaryTotalBeadsText">72</span> 알
           </span>
         </div>
 
-        <!-- 가로 묵주 체인 인디케이터 (자동 스크롤) -->
-        <div class="w-full overflow-x-auto py-2 flex items-center gap-1.5 custom-scrollbar" id="beadChainBar"></div>
+        <!-- 1~5단 빠른 점프 바 -->
+        <div class="w-full flex items-center justify-center gap-1 mb-2.5 flex-wrap" id="decadeQuickBar">
+          <button onclick="jumpToDecade(0)" id="btnDecade0" class="decade-quick-btn text-[11px] py-1 px-2 rounded-lg font-semibold bg-indigo-600 text-white">시작</button>
+          <button onclick="jumpToDecade(1)" id="btnDecade1" class="decade-quick-btn text-[11px] py-1 px-2 rounded-lg font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">1단</button>
+          <button onclick="jumpToDecade(2)" id="btnDecade2" class="decade-quick-btn text-[11px] py-1 px-2 rounded-lg font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">2단</button>
+          <button onclick="jumpToDecade(3)" id="btnDecade3" class="decade-quick-btn text-[11px] py-1 px-2 rounded-lg font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">3단</button>
+          <button onclick="jumpToDecade(4)" id="btnDecade4" class="decade-quick-btn text-[11px] py-1 px-2 rounded-lg font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">4단</button>
+          <button onclick="jumpToDecade(5)" id="btnDecade5" class="decade-quick-btn text-[11px] py-1 px-2 rounded-lg font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">5단</button>
+        </div>
 
-        <!-- 기도문 본문 디스플레이 -->
-        <div class="w-full my-auto py-2">
-          <div class="text-xs font-bold text-blue-600 mb-1" id="beadGuideTitle">
-            시작 기도 · 성호경과 사도신경
+        <!-- 가로 스크롤 묵주알 체인 -->
+        <div class="w-full overflow-x-auto py-1 px-1 mb-3 flex items-center gap-1.5 custom-scrollbar" id="beadChainBar"></div>
+
+        <!-- 기도 본문 카드 -->
+        <div class="w-full my-auto py-1">
+          <div class="flex items-center justify-between px-1 mb-1">
+            <span class="text-xs font-semibold text-indigo-600 truncate text-left" id="beadGuideTitle">
+              시작 기도 · 성호경과 사도신경
+            </span>
+            <div class="flex items-center space-x-1 shrink-0">
+              <button onclick="adjustFontSize(-1)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 text-[10px] font-bold text-slate-600 flex items-center justify-center">가-</button>
+              <button onclick="adjustFontSize(1)" class="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 text-[10px] font-bold text-slate-600 flex items-center justify-center">가+</button>
+            </div>
           </div>
-          <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 mb-2.5" id="beadPrayerName">
+
+          <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 mb-2.5 text-left px-1" id="beadPrayerName">
             사도신경
-          </h2>
-          <div id="beadPrayerBox" class="bg-slate-50 rounded-2xl p-4 text-xs sm:text-sm leading-relaxed text-slate-700 text-left border border-slate-200 max-h-60 sm:max-h-72 overflow-y-auto custom-scrollbar whitespace-pre-line font-medium">
-          </div>
+          </h3>
+          <div id="beadPrayerBox" class="bg-slate-50 rounded-2xl p-4 text-xs sm:text-sm leading-relaxed text-slate-700 text-left border border-slate-200/80 max-h-60 overflow-y-auto custom-scrollbar whitespace-pre-line font-medium"></div>
         </div>
 
-        <!-- 하단 큰 터치 버튼 영역 (엄지 탭) -->
-        <div class="w-full pt-3 border-t border-slate-100 flex flex-col gap-2">
-          <button id="mainTapBtn" onclick="nextBead()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-sm sm:text-base shadow-lg shadow-blue-500/20 active:scale-[0.98] transition-transform flex items-center justify-center gap-2">
+        <!-- 터치 액션 버튼 -->
+        <div class="w-full mt-3 pt-2 border-t border-slate-100 flex flex-col items-center gap-2">
+          <button id="mainBeadTapBtn" onclick="nextBead()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold text-sm sm:text-base shadow-lg shadow-indigo-500/25 active:scale-[0.98] transition-transform flex items-center justify-center gap-2">
             <i class="fa-solid fa-fingerprint text-lg"></i>
-            <span id="mainTapBtnLabel">다음 묵주알로 넘어가기 (화면 탭)</span>
+            <span id="mainBeadTapLabel">다음 묵주알 넘기기 (화면 탭)</span>
           </button>
           
-          <div class="w-full flex justify-between items-center px-1 text-xs text-slate-500 font-medium">
+          <div class="w-full flex justify-between items-center px-1 text-[11px] text-slate-500 font-medium">
             <button onclick="prevBead()" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 transition-transform flex items-center gap-1">
               <i class="fa-solid fa-chevron-left text-[10px]"></i> 이전 알
             </button>
-            <span class="text-[10px] text-slate-400">화면을 탭하면 진동과 함께 넘어갑니다</span>
-            <button onclick="resetBeads()" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 transition-transform">
-              처음으로
+            <span class="text-[10px] text-slate-400">화면을 탭하면 묵주알이 넘어갑니다</span>
+            <button onclick="resetBeadProgress()" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 transition-transform">
+              처음부터
             </button>
           </div>
         </div>
 
+      </div>
+
+      <!-- 성모 찬송 바로가기 카드 -->
+      <div class="bg-indigo-50/70 border border-indigo-100 rounded-2xl p-3.5 flex items-center justify-between">
+        <div>
+          <h4 class="text-xs font-bold text-indigo-950">5단 완송 후 마침 기도</h4>
+          <p class="text-[11px] text-indigo-700 mt-0.5">성모 찬송(Salve Regina) 및 마침 성호경</p>
+        </div>
+        <button onclick="jumpToSalveRegina()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-xs flex items-center gap-1">
+          <span>성모 찬송 보기</span>
+          <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        </button>
       </div>
 
     </div>
 
-    <!-- [뷰 2] 전체 기도문 펼침 보기 뷰 (선택 시 전환) -->
-    <div id="rosaryFullTextView" class="hidden space-y-3 pb-6">
-      <div class="bg-blue-50 p-3 rounded-2xl border border-blue-100 text-xs text-blue-900 leading-relaxed font-medium">
-        묵주기도 5단의 모든 신비와 기도문을 한 번에 확인하며 천천히 읽으실 수 있는 모드입니다.
-      </div>
+    <!-- 전체 텍스트 모드 -->
+    <div id="rosaryListView" class="hidden space-y-3">
+      <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
+        <div class="p-3 bg-indigo-50/80 rounded-xl border border-indigo-100 text-xs text-indigo-900 leading-relaxed font-medium">
+          신비 5단의 모든 기도문을 처음부터 끝까지 한눈에 확인하며 정성껏 바칠 수 있는 목록 모드입니다.
+        </div>
 
-      <div id="fullTextAccordionList" class="space-y-2.5">
-        <!-- JS로 동적 아코디언 렌더링 -->
+        <details class="group bg-slate-50 rounded-xl border border-slate-200 p-3" open>
+          <summary class="font-bold text-xs cursor-pointer text-slate-800 flex justify-between items-center">
+            <span>시작 기도: 십자가 성호경 · 사도신경 · 주님의 기도 · 성모송 3번 · 영광송 · 구원송</span>
+            <i class="fa-solid fa-chevron-down text-slate-400 group-open:rotate-180 transition-transform text-[10px]"></i>
+          </summary>
+          <div class="text-xs text-slate-600 mt-2.5 leading-relaxed space-y-2.5 border-t border-slate-200/60 pt-2 whitespace-pre-line">
+            <div>
+              <p class="font-bold text-indigo-900 mb-1">1. 성호경 및 사도신경</p>
+              <p id="listApostlesCreed"></p>
+            </div>
+            <div class="pt-2 border-t border-slate-200/60">
+              <p class="font-bold text-indigo-900 mb-1">2. 주님의 기도</p>
+              <p id="listLordsPrayer"></p>
+            </div>
+            <div class="pt-2 border-t border-slate-200/60">
+              <p class="font-bold text-indigo-900 mb-1">3. 성모송 (믿음·희망·사랑의 덕을 청하며 3번)</p>
+              <p id="listHailMary"></p>
+            </div>
+            <div class="pt-2 border-t border-slate-200/60">
+              <p class="font-bold text-indigo-900 mb-1">4. 영광송 및 구원송</p>
+              <p id="listGloryFatima"></p>
+            </div>
+          </div>
+        </details>
+
+        <!-- 1~5단 펼침 목록 -->
+        <div id="listDecadesContainer" class="space-y-2"></div>
+
+        <!-- 마침 성모 찬송 (공식 가톨릭 기도서) -->
+        <details class="group bg-indigo-50/50 rounded-xl border border-indigo-200 p-3" open>
+          <summary class="font-bold text-xs cursor-pointer text-indigo-950 flex justify-between items-center">
+            <span>마침: 성모 찬송(Salve Regina) 및 마침 성호경</span>
+            <i class="fa-solid fa-chevron-down text-indigo-400 group-open:rotate-180 transition-transform text-[10px]"></i>
+          </summary>
+          <div class="text-xs text-slate-700 mt-2.5 leading-relaxed border-t border-indigo-100 pt-2 whitespace-pre-line font-medium" id="listSalveRegina">
+          </div>
+        </details>
       </div>
     </div>
 
   </main>
 
-  <!-- 예비자용 묵주기도 가이드 모달 -->
+  <!-- 예비자를 위한 묵주기도 가이드 모달 -->
   <div id="guideModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white w-full max-w-lg max-h-[85vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-slate-200">
       <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-          <i class="fa-solid fa-hands-praying text-blue-600"></i>
-          <span>예비자를 위한 묵주기도 방법</span>
+        <h3 class="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
+          <i class="fa-solid fa-book-open-reader text-indigo-600"></i>
+          <span>예비자를 위한 묵주기도 안내</span>
         </h3>
-        <button onclick="closeGuideModal()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center">
+        <button onclick="closeGuideModal()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center transition-colors">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
-      <div class="p-4 overflow-y-auto custom-scrollbar text-xs leading-relaxed text-slate-700 space-y-3.5">
-        <div class="p-3 bg-blue-50/70 rounded-xl border border-blue-100">
-          <p class="font-bold text-blue-950 mb-1">💡 묵주기도란?</p>
-          <p class="text-slate-600">성모 마리아와 함께 예수 그리스도의 생애(잉태, 전교, 수난, 부활)를 묵상하며 바치는 가톨릭의 가장 아름다운 전통 기도입니다.</p>
+
+      <div class="p-4 overflow-y-auto space-y-3.5 text-xs text-slate-700 leading-relaxed custom-scrollbar">
+        <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100">
+          <h4 class="font-bold text-indigo-900 mb-1">묵주기도(Rosarium)란?</h4>
+          <p>예수님의 생애와 구원 신비를 성모 마리아와 함께 묵상하며 주님의 기도와 성모송을 바치는 가톨릭의 가장 대표적인 묵상 기도입니다.</p>
         </div>
 
-        <div class="space-y-2">
-          <p class="font-bold text-slate-900">📿 요일별 바치는 신비 권장</p>
-          <ul class="list-disc pl-5 space-y-1 text-slate-600">
-            <li><span class="font-semibold text-blue-700">월요일·토요일:</span> 환희의 신비 (예수님의 탄생과 어린 시절)</li>
-            <li><span class="font-semibold text-amber-600">목요일:</span> 빛의 신비 (예수님의 공생활과 복음 선포)</li>
-            <li><span class="font-semibold text-rose-600">화요일·금요일:</span> 고통의 신비 (우리를 위한 십자가 수난)</li>
-            <li><span class="font-semibold text-emerald-700">수요일·일요일:</span> 영광의 신비 (부활과 성령 강림, 성모 승천)</li>
+        <div>
+          <h4 class="font-bold text-slate-800 mb-1">요일별 권장 신비</h4>
+          <ul class="space-y-1 text-slate-600 list-disc list-inside">
+            <li><span class="font-semibold text-slate-800">월요일 · 토요일:</span> 환희의 신비 (예수님의 잉태와 탄생)</li>
+            <li><span class="font-semibold text-slate-800">목요일:</span> 빛의 신비 (예수님의 공생활과 하느님 나라)</li>
+            <li><span class="font-semibold text-slate-800">화요일 · 금요일:</span> 고통의 신비 (예수님의 수난과 십자가 죽음)</li>
+            <li><span class="font-semibold text-slate-800">수요일 · 일요일:</span> 영광의 신비 (예수님의 부활, 승천, 성령 강림)</li>
           </ul>
         </div>
 
-        <div class="space-y-2">
-          <p class="font-bold text-slate-900">📖 묵주 5단의 기본 순서</p>
-          <ol class="list-decimal pl-5 space-y-1 text-slate-600">
-            <li>십자가를 쥐고 성호경과 사도신경</li>
-            <li>첫 번째 큰 알: 주님의 기도 1번</li>
-            <li>이어지는 세 알: 성모송 3번 (믿음·희망·사랑 청원)</li>
-            <li>사슬: 영광송 및 구원송</li>
-            <li>각 단마다: <strong>신비 묵상 선포 ➔ 주님의 기도 1번 ➔ 성모송 10번 ➔ 영광송 ➔ 구원송</strong></li>
-            <li>5단을 마친 후: <strong>성모 찬송(Salve Regina)</strong>과 마침 성호경</li>
+        <div>
+          <h4 class="font-bold text-slate-800 mb-1">기도 순서 (5단 기준)</h4>
+          <ol class="space-y-1 text-slate-600 list-decimal list-inside">
+            <li>십자가를 잡고 성호경을 긋고 사도신경을 바칩니다.</li>
+            <li>첫 큰 알에서 주님의 기도를 1번 바칩니다.</li>
+            <li>다음 세 알에서 성모송을 3번 바칩니다. (믿음, 희망, 사랑)</li>
+            <li>줄에서 영광송과 구원송을 바칩니다.</li>
+            <li>제 1단~5단: 신비 묵상 선포 ➔ 주님의 기도 1번 ➔ 성모송 10번 ➔ 영광송 ➔ 구원송</li>
+            <li>5단 후: 성모 찬송을 바치고 마침 성호경으로 기도를 마칩니다.</li>
           </ol>
         </div>
       </div>
-      <div class="p-3 border-t border-slate-200 bg-slate-50 text-right">
-        <button onclick="closeGuideModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold">확인했습니다</button>
+
+      <div class="p-3 border-t border-slate-200 bg-slate-50 flex justify-end">
+        <button onclick="closeGuideModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold">
+          닫기
+        </button>
       </div>
     </div>
   </div>
 
   <!-- 알림 토스트 UI -->
-  <div id="toastMessage" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs px-4 py-2.5 rounded-full shadow-lg opacity-0 transition-opacity pointer-events-none duration-200 z-50">
+  <div id="toastMessage" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs px-4 py-2 rounded-full shadow-lg opacity-0 transition-opacity pointer-events-none duration-200 z-50">
     알림
   </div>
 
   <script>
-    // 가톨릭 공식 표준 기도문 (하늘에 계신 우리 아버지 / 구원송 끝 아멘 삭제)
+    // 가톨릭 공식 기도서 표준 원문
     const PRAYER_TEXTS = {
-      signOfCross: `성부와 성자와 성령의 이름으로. 아멘.`,
-      apostlesCreed: `전능하신 천주 성부 천지의 창조주를 저는 믿나이다.\n그 외아들 우리 주 예수 그리스도님, (고개를 숙이며) 성령으로 인하여 동정 마리아께 잉태되어 나시고, 본시오 빌라도 통치 아래서 고난을 받으시고 십자가에 못박혀 돌아가시고 묻히셨으며, 저승에 가시어 사흗날에 죽은 이들 가운데서 부활하시고 하늘에 올라 전능하신 천주 성부 오른편에 앉으시며, 그리로부터 산 이와 죽은 이들을 심판하러 오시리라 믿나이다.\n성령을 믿으며 거룩하고 보편된 교회와 모든 성인의 통공을 믿으며, 죄의 용서와 육신의 부활을 믿으며 영원한 삶을 믿나이다. ◎ 아멘.`,
-      lordsPrayer: `○ 하늘에 계신 우리 아버지,\n아버지의 이름이 거룩히 빛나시며 아버지의 나라가 오시며 아버지의 뜻이 하늘에서와 같이 땅에서도 이루어지소서!\n\n● 오늘 저희에게 일용할 양식을 주시고 저희에게 잘못한 이를 저희가 용서하오니 저희 죄를 용서하시고 저희를 유혹에 빠지지 않게 하시고 악에서 구하소서. ◎ 아멘.`,
-      hailMary: `○ 은총이 가득하신 마리아님, 기뻐하소서!\n주님께서 함께 계시니 여인 중에 복되시며 태중의 아들 예수님 또한 복되시나이다.\n\n● 천주의 성모 마리아님,\n이제와 저희 죽을 때에 저희 죄인을 위하여 빌어주소서. ◎ 아멘.`,
-      gloryBe: `○ 영광이 성부와 성자와 성령께\n● 처음과 같이 이제와 항상 영원히. ◎ 아멘.`,
-      fatimaPrayer: `◎ 예수님, 저희 죄를 용서하시며 저희를 지옥 불에서 구하시고, 연옥 영혼을 돌보시며 가장 버림받은 영혼을 돌보소서.`,
-      hailHolyQueen: `○ 모후이시며 사랑이 넘친 어머니, 우리의 생명, 기쁨, 희망이시여.\n● 당신 우러러 하와의 그 자손들이 눈물을 흘리며 부르짖나이다. 슬픔의 골짜기에서.\n○ 우리들의 변호자이신 주님, 자비로운 눈으로 우리를 굽어보소서.\n● 기나긴 귀양살이 끝난 뒤에 태중의 복되신 열매 예수님을 보여 주소서.\n○ 너그러우시고, 자애로우시며, 오! 아름다우신 동정 마리아님.\n● 천주의 성모님, 저희를 위하여 빌어주시어\n◎ 그리스도께서 약속하신 영원한 생명을 얻게 하소서. 아멘.`
+      signOfCross: `성부와 성자와 성령의 이름으로. ◎ 아멘.`,
+      apostles: `성부와 성자와 성령의 이름으로. 아멘.\n\n전능하신 천주 성부 천지의 창조주를 저는 믿나이다.\n그 외아들 우리 주 예수 그리스도님, (고개를 숙이며) 성령으로 인하여 동정 마리아께 잉태되어 나시고, 본시오 빌라도 통치 아래서 고난을 받으시고 십자가에 못박혀 돌아가시고 묻히셨으며, 저승에 가시어 사흗날에 죽은 이들 가운데서 부활하시고 하늘에 올라 전능하신 천주 성부 오른편에 앉으시며, 그리로부터 산 이와 죽은 이들을 심판하러 오시리라 믿나이다.\n성령을 믿으며 거룩하고 보편된 교회와 모든 성인의 통공을 믿으며, 죄의 용서와 육신의 부활을 믿으며 영원한 삶을 믿나이다. ◎ 아멘.`,
+      lords: `○ 하늘에 계신 우리 아버지, 아버지의 이름이 거룩히 빛나시며 아버지의 나라가 오시며 아버지의 뜻이 하늘에서와 같이 땅에서도 이루어지소서!\n\n● 오늘 저희에게 일용할 양식을 주시고 저희에게 잘못한 이를 저희가 용서하오니 저희 죄를 용서하시고 저희를 유혹에 빠지지 않게 하시고 악에서 구하소서. ◎ 아멘.`,
+      hailMary: `○ 은총이 가득하신 마리아님, 기뻐하소서! 주님께서 함께 계시니 여인 중에 복되시며 태중의 아들 예수님 또한 복되시나이다.\n\n● 천주의 성모 마리아님, 이제와 저희 죽을 때에 저희 죄인을 위하여 빌어주소서. ◎ 아멘.`,
+      glory: `○ 영광이 성부와 성자와 성령께\n● 처음과 같이 이제와 항상 영원히. ◎ 아멘.`,
+      fatima: `◎ 예수님, 저희 죄를 용서하시며 저희를 지옥 불에서 구하시고, 연옥 영혼을 돌보시며 가장 버림받은 영혼을 돌보소서.`,
+      // 한국천주교 주교회의 『가톨릭 기도서』 공식 성모 찬송 (Salve Regina) 전문
+      salveRegina: `○ 모후이시며 사랑이 넘친 어머니,
+우리의 생명, 기쁨, 희망이시여,
+● 당신 우러러 하와의 그 자손들이
+눈물을 흘리며 부르짖나이다, 슬픔의 골짜기에서.
+○ 우리들의 보호자 성모님,
+불쌍한 저희를 인자로운 눈으로 굽어보소서.
+● 귀양살이 끝날 때에
+당신의 아들 우리 주 예수님 뵙게 하소서.
+너그러우시고, 자애로우시며,
+오! 아름다우신 동정 마리아님.
+○ 천주의 성모님, 저희를 위하여 빌어주시어
+● 그리스도께서 약속하신 영원한 생명을 얻게 하소서.
+
+╋ 기도합시다.
+하느님, 외아드님께서 삶과 죽음과 부활로
+저희에게 영원한 구원을 마련해 주셨나이다.
+복되신 동정 마리아와 함께 이 신비를 묵상하며
+묵주기도를 바치오니
+저희가 그 가르침을 따라
+영원한 생명을 얻게 하소서.
+우리 주 그리스도를 통하여 비나이다.
+◎ 아멘.
+
+[마침 성호경]
+† 성부와 성자와 성령의 이름으로. 아멘.`
     };
 
-    // 4대 신비 1~5단 상세 묵상 선포문 및 성경 배경
+    // 4대 신비 5단 묵상 목록
     const MYSTERY_DATA = {
-      "환희": {
-        name: "환희의 신비",
-        decades: [
-          { num: 1, title: "환희의 신비 1단", announce: "환희의 신비 1단: 마리아께서 예수님을 잉태하심을 묵상합시다.", scripture: "“보라, 이제 네가 잉태하여 아들을 낳을 터이니 그 이름을 예수라 하여라.” (루카 1,31)" },
-          { num: 2, title: "환희의 신비 2단", announce: "환희의 신비 2단: 마리아께서 엘리사벳을 찾아보심을 묵상합시다.", scripture: "“당신은 여인들 가운데에서 가장 복되시며 당신 태중의 아기도 복되십니다.” (루카 1,42)" },
-          { num: 3, title: "환희의 신비 3단", announce: "환희의 신비 3단: 마리아께서 예수님을 낳으심을 묵상합시다.", scripture: "“마리아는 첫아들을 낳아 포대기에 싸서 구유에 뉘었다. 여관에는 그들이 머무를 방이 없었기 때문이다.” (루카 2,7)" },
-          { num: 4, title: "환희의 신비 4단", announce: "환희의 신비 4단: 마리아께서 예수님을 성전에 바치심을 묵상합시다.", scripture: "“모세의 율법에 따라 정결례를 거행할 날이 되자, 아기를 예루살렘으로 데리고 올라가 주님께 바쳤다.” (루카 2,22)" },
-          { num: 5, title: "환희의 신비 5단", announce: "환희의 신비 5단: 마리아께서 잃으셨던 예수님을 성전에서 찾으심을 묵상합시다.", scripture: "“사흘 뒤에야 성전에서 그를 찾아냈는데, 율법 교사들 가운데에 앉아 이야기를 듣기도 하고 묻기도 하고 있었다.” (루카 2,46)" }
-        ]
-      },
-      "빛": {
-        name: "빛의 신비",
-        decades: [
-          { num: 1, title: "빛의 신비 1단", announce: "빛의 신비 1단: 예수님께서 세례받으심을 묵상합시다.", scripture: "“너는 내가 사랑하는 아들, 내 마음에 드는 아들이다.” (마르 1,11)" },
-          { num: 2, title: "빛의 신비 2단", announce: "빛의 신비 2단: 예수님께서 카나에서 첫 기적을 행하심을 묵상합시다.", scripture: "“무엇이든지 그가 시키는 대로 하여라.” (요한 2,5)" },
-          { num: 3, title: "빛의 신비 3단", announce: "빛의 신비 3단: 예수님께서 하느님 나라를 선포하심을 묵상합시다.", scripture: "“때가 차서 하느님의 나라가 가까이 왔다. 회개하고 복음을 믿어라.” (마르 1,15)" },
-          { num: 4, title: "빛의 신비 4단", announce: "빛의 신비 4단: 예수님께서 거룩하게 변모하심을 묵상합시다.", scripture: "“그들 앞에서 모습이 변모하셨는데, 그분의 얼굴은 해처럼 빛나고 옷은 빛처럼 하얘졌다.” (마태 17,2)" },
-          { num: 5, title: "빛의 신비 5단", announce: "빛의 신비 5단: 예수님께서 성체성사를 세우심을 묵상합시다.", scripture: "“받아 먹어라. 이는 내 몸이다. 모두 이 잔을 마셔라. 이는 나의 피다.” (마태 26,26-28)" }
-        ]
-      },
-      "고통": {
-        name: "고통의 신비",
-        decades: [
-          { num: 1, title: "고통의 신비 1단", announce: "고통의 신비 1단: 예수님께서 우리를 위하여 피땀 흘리심을 묵상합시다.", scripture: "“아버지, 아버지께서 원하시면 이 잔을 저에게서 거두어 주십시오. 그러나 제 뜻이 아니라 아버지의 뜻이 이루어지게 하십시오.” (루카 22,42)" },
-          { num: 2, title: "고통의 신비 2단", announce: "고통의 신비 2단: 예수님께서 우리를 위하여 매맞으심을 묵상합시다.", scripture: "“빌라도는 예수님을 데려다가 군사들에게 채찍질을 하게 하였다.” (요한 19,1)" },
-          { num: 3, title: "고통의 신비 3단", announce: "고통의 신비 3단: 예수님께서 우리를 위하여 가시관 쓰심을 묵상합시다.", scripture: "“군사들은 가시나무로 관을 엮어 그분 머리에 씌우고 자주색 옷을 입혔다.” (요한 19,2)" },
-          { num: 4, title: "고통의 신비 4단", announce: "고통의 신비 4단: 예수님께서 우리를 위하여 십자가 지심을 묵상합시다.", scripture: "“예수님께서는 몸소 십자가를 지시고 ‘해골 터’라는 곳으로 나가셨다.” (요한 19,17)" },
-          { num: 5, title: "고통의 신비 5단", announce: "고통의 신비 5단: 예수님께서 우리를 위하여 십자가에 못박혀 돌아가심을 묵상합시다.", scripture: "“예수님께서 큰 소리로 외치셨다. ‘아버지, 제 영을 아버지 손에 맡깁니다.’ 이 말씀을 하시고 숨을 거두셨다.” (루카 23,46)" }
-        ]
-      },
-      "영광": {
-        name: "영광의 신비",
-        decades: [
-          { num: 1, title: "영광의 신비 1단", announce: "영광의 신비 1단: 예수님께서 부활하심을 묵상합시다.", scripture: "“그분께서는 여기에 계시지 않는다. 말씀하신 대로 되살아나셨다.” (마태 28,6)" },
-          { num: 2, title: "영광의 신비 2단", announce: "영광의 신비 2단: 예수님께서 승천하심을 묵상합시다.", scripture: "“예수님께서는 그들을 축복하시며 그들을 떠나 하늘로 올라가셨다.” (루카 24,51)" },
-          { num: 3, title: "영광의 신비 3단", announce: "영광의 신비 3단: 예수님께서 성령을 보내심을 묵상합시다.", scripture: "“모두 성령으로 가득 차, 성령께서 표현의 능력을 주시는 대로 다른 언어들로 말하기 시작하였다.” (사도 2,4)" },
-          { num: 4, title: "영광의 신비 4단", announce: "영광의 신비 4단: 예수님께서 마리아를 하늘에 불러올리심을 묵상합시다.", scripture: "“태양을 입고 발밑에 달을 두고 머리에 열두 개 별로 된 관을 쓴 여인이 나타났습니다.” (묵시 12,1)" },
-          { num: 5, title: "영광의 신비 5단", announce: "영광의 신비 5단: 예수님께서 마리아에게 천상 모후의 관을 씌우심을 묵상합시다.", scripture: "“주님께서는 비천한 당신 종을 굽어보셨으니 이제부터 과연 모든 세대가 나를 복되다 하리라.” (루카 1,48)" }
-        ]
-      }
+      "환희": [
+        "환희의 신비 1단: 마리아께서 예수님을 잉태하심을 묵상합시다.",
+        "환희의 신비 2단: 마리아께서 엘리사벳을 찾아보심을 묵상합시다.",
+        "환희의 신비 3단: 마리아께서 예수님을 낳으심을 묵상합시다.",
+        "환희의 신비 4단: 마리아께서 예수님을 성전에 바치심을 묵상합시다.",
+        "환희의 신비 5단: 마리아께서 성전에서 예수님을 찾으심을 묵상합시다."
+      ],
+      "빛": [
+        "빛의 신비 1단: 예수님께서 세례받으심을 묵상합시다.",
+        "빛의 신비 2단: 예수님께서 카나에서 첫 기적을 행하심을 묵상합시다.",
+        "빛의 신비 3단: 예수님께서 하느님 나라를 선포하심을 묵상합시다.",
+        "빛의 신비 4단: 예수님께서 거룩하게 변모하심을 묵상합시다.",
+        "빛의 신비 5단: 예수님께서 성체성사를 세우심을 묵상합시다."
+      ],
+      "고통": [
+        "고통의 신비 1단: 예수님께서 우리를 위하여 피땀 흘리심을 묵상합시다.",
+        "고통의 신비 2단: 예수님께서 우리를 위하여 매맞으심을 묵상합시다.",
+        "고통의 신비 3단: 예수님께서 우리를 위하여 가시관 쓰심을 묵상합시다.",
+        "고통의 신비 4단: 예수님께서 우리를 위하여 십자가 지심을 묵상합시다.",
+        "고통의 신비 5단: 예수님께서 우리를 위하여 십자가에 못박혀 돌아가심을 묵상합시다."
+      ],
+      "영광": [
+        "영광의 신비 1단: 예수님께서 부활하심을 묵상합시다.",
+        "영광의 신비 2단: 예수님께서 승천하심을 묵상합시다.",
+        "영광의 신비 3단: 예수님께서 성령을 보내심을 묵상합시다.",
+        "영광의 신비 4단: 예수님께서 마리아를 하늘에 불러올리심을 묵상합시다.",
+        "영광의 신비 5단: 예수님께서 마리아에게 천상 모후의 관을 씌우심을 묵상합시다."
+      ]
     };
 
+    let selectedMystery = "환희";
     let currentBeadIdx = 0;
-    let beadSequence = [];
-    let currentMode = 'touch'; // 'touch' or 'text'
-    let currentFontSize = 13;
+    let textFontSize = 13;
 
     function buildBeadSequence() {
-      const selected = document.getElementById('selectMystery').value;
-      const mysteriesToBuild = (selected === '전체') ? ["환희", "빛", "고통", "영광"] : [selected];
-
       const seq = [];
 
-      // 1. 공통 시작 기도 (십자가, 첫 큰 알, 작은 3알, 마침 사슬)
-      seq.push({
-        type: 'cross',
-        badge: '십자가',
-        guide: '성호경과 사도신경',
-        name: '사도신경',
-        decadeNum: 0,
-        text: `${PRAYER_TEXTS.signOfCross}\n\n${PRAYER_TEXTS.apostlesCreed}`
-      });
+      // 1. 시작 기도
+      seq.push({ decadeGroup: 0, badge: "십자가", title: "시작 성호경 및 사도신경", name: "사도신경", type: "cross", body: PRAYER_TEXTS.apostles });
+      seq.push({ decadeGroup: 0, badge: "시작 큰 알", title: "묵주기도를 시작하며 바치는 기도", name: "주님의 기도", type: "large", body: PRAYER_TEXTS.lords });
+      seq.push({ decadeGroup: 0, badge: "시작 작은 알 1", title: "믿음의 덕을 청하며", name: "성모송 (첫 번째)", type: "small", body: PRAYER_TEXTS.hailMary });
+      seq.push({ decadeGroup: 0, badge: "시작 작은 알 2", title: "희망의 덕을 청하며", name: "성모송 (두 번째)", type: "small", body: PRAYER_TEXTS.hailMary });
+      seq.push({ decadeGroup: 0, badge: "시작 작은 알 3", title: "사랑의 덕을 청하며", name: "성모송 (세 번째)", type: "small", body: PRAYER_TEXTS.hailMary });
+      seq.push({ decadeGroup: 0, badge: "연결 고리", title: "1단으로 들어가는 마침", name: "영광송 · 구원송", type: "chain", body: `${PRAYER_TEXTS.glory}\n\n[구원송]\n${PRAYER_TEXTS.fatima}` });
 
-      seq.push({
-        type: 'large',
-        badge: '시작 큰 알',
-        guide: '교황님의 지향과 하느님의 뜻을 청하며',
-        name: '주님의 기도',
-        decadeNum: 0,
-        text: PRAYER_TEXTS.lordsPrayer
-      });
+      const mysteriesToBuild = (selectedMystery === "전체20단") 
+        ? ["환희", "빛", "고통", "영광"]
+        : [selectedMystery];
 
-      seq.push({
-        type: 'small',
-        badge: '작은 알 1',
-        guide: '믿음의 덕을 청하며',
-        name: '성모송 (1번째)',
-        decadeNum: 0,
-        text: PRAYER_TEXTS.hailMary
-      });
-
-      seq.push({
-        type: 'small',
-        badge: '작은 알 2',
-        guide: '희망의 덕을 청하며',
-        name: '성모송 (2번째)',
-        decadeNum: 0,
-        text: PRAYER_TEXTS.hailMary
-      });
-
-      seq.push({
-        type: 'small',
-        badge: '작은 알 3',
-        guide: '사랑의 덕을 청하며',
-        name: '성모송 (3번째)',
-        decadeNum: 0,
-        text: PRAYER_TEXTS.hailMary
-      });
-
-      seq.push({
-        type: 'chain',
-        badge: '연결 고리',
-        guide: '1단에 들어가기 앞서 바치는 찬미',
-        name: '영광송 · 구원송',
-        decadeNum: 0,
-        text: `${PRAYER_TEXTS.gloryBe}\n\n[구원송]\n${PRAYER_TEXTS.fatimaPrayer}`
-      });
-
-      // 2. 신비 5단 순차 빌드 (전체 선택 시 4개 신비 x 5단 = 20단)
-      mysteriesToBuild.forEach((mKey, mIdx) => {
-        const mInfo = MYSTERY_DATA[mKey];
-
-        mInfo.decades.forEach((dec) => {
-          // 큰 알: 묵상 선포 + 주님의 기도
+      mysteriesToBuild.forEach((mName) => {
+        const decades = MYSTERY_DATA[mName];
+        decades.forEach((decText, dIdx) => {
+          const dNum = dIdx + 1;
+          
           seq.push({
-            type: 'large',
-            badge: `${mKey} ${dec.num}단`,
-            guide: `${mInfo.name} 제 ${dec.num}단 묵상 선포`,
-            name: dec.title,
-            decadeNum: dec.num,
-            mysteryKey: mKey,
-            text: `【 묵상 선포 】\n${dec.announce}\n\n📖 ${dec.scripture}\n\n${PRAYER_TEXTS.lordsPrayer}`
+            decadeGroup: dNum,
+            badge: `${mName} ${dNum}단`,
+            title: `${mName}의 신비 제 ${dNum}단 묵상`,
+            name: `${dNum}단: ${decText.split(':')[0].trim()}`,
+            type: "large",
+            body: `【 묵상 선포 】\n${decText}\n\n${PRAYER_TEXTS.lords}`
           });
 
-          // 성모송 10알
           for (let s = 1; s <= 10; s++) {
             seq.push({
-              type: 'small',
-              badge: `${mKey} ${dec.num}단 (${s}/10)`,
-              guide: `${dec.title}을 묵상하며`,
+              decadeGroup: dNum,
+              badge: `${mName} ${dNum}단 (${s}/10)`,
+              title: `${decText.split(':')[1]?.trim() || decText}`,
               name: `성모송 (${s}번째 알)`,
-              decadeNum: dec.num,
-              mysteryKey: mKey,
-              text: PRAYER_TEXTS.hailMary
+              type: "small",
+              body: PRAYER_TEXTS.hailMary
             });
           }
 
-          // 영광송 & 구원송
           seq.push({
-            type: 'chain',
-            badge: `${mKey} ${dec.num}단 마침`,
-            guide: `${dec.title}을 마치며`,
-            name: '영광송 · 구원송',
-            decadeNum: dec.num,
-            mysteryKey: mKey,
-            text: `${PRAYER_TEXTS.gloryBe}\n\n[구원송]\n${PRAYER_TEXTS.fatimaPrayer}`
+            decadeGroup: dNum,
+            badge: `${mName} ${dNum}단 마침`,
+            title: `${dNum}단을 마치며 바치는 기도`,
+            name: "영광송 · 구원송",
+            type: "chain",
+            body: `${PRAYER_TEXTS.glory}\n\n[구원송]\n${PRAYER_TEXTS.fatima}`
           });
         });
       });
 
-      // 3. 마침 기도: 성모 찬송(Salve Regina) 및 마침 성호경
+      // 마침: 가톨릭 공식 성모 찬송 (Salve Regina)
       seq.push({
-        type: 'finish',
-        badge: '마침 기도',
-        guide: '묵주기도를 마치며 드리는 찬송',
-        name: '성모 찬송 (Salve Regina)',
-        decadeNum: 5,
-        text: `${PRAYER_TEXTS.hailHolyQueen}\n\n╋ 성부와 성자와 성령의 이름으로. 아멘.\n\n🎉 정성껏 묵주기도를 모두 마쳤습니다! 평화의 인사를 나눕니다.`
+        decadeGroup: 99,
+        badge: "마침 기도",
+        title: "묵주기도 마침 기도 · 전례 공식 성모 찬송",
+        name: "성모 찬송 (Salve Regina)",
+        type: "salve",
+        body: PRAYER_TEXTS.salveRegina
       });
 
-      beadSequence = seq;
+      return seq;
     }
 
-    function renderBeadChain() {
-      const bar = document.getElementById('beadChainBar');
-      bar.innerHTML = '';
+    function updateBeadDisplay() {
+      const seq = buildBeadSequence();
+      if (currentBeadIdx >= seq.length) currentBeadIdx = seq.length - 1;
+      const cur = seq[currentBeadIdx];
 
-      beadSequence.forEach((item, idx) => {
-        const dot = document.createElement('button');
-        dot.id = `bead-dot-${idx}`;
-        dot.onclick = () => jumpToBead(idx);
-
-        let shapeClass = 'w-4 h-4 text-[9px]';
-        let content = `${idx + 1}`;
-
-        if (item.type === 'cross') {
-          shapeClass = 'w-6 h-6 text-[10px] font-bold';
-          content = '<i class="fa-solid fa-cross"></i>';
-        } else if (item.type === 'large') {
-          shapeClass = 'w-5 h-5 text-[10px] font-bold';
-          content = item.decadeNum > 0 ? `${item.decadeNum}단` : '큰알';
-        } else if (item.type === 'chain') {
-          shapeClass = 'w-4 h-4 text-[8px]';
-          content = '<i class="fa-solid fa-link"></i>';
-        } else if (item.type === 'finish') {
-          shapeClass = 'w-6 h-6 text-[10px] font-bold';
-          content = '<i class="fa-solid fa-flag-checkered"></i>';
-        }
-
-        dot.className = `shrink-0 rounded-full flex items-center justify-center transition-all ${shapeClass} ${
-          idx === currentBeadIdx
-            ? 'bg-blue-600 text-white font-bold ring-2 ring-blue-300 ring-offset-1 scale-110'
-            : idx < currentBeadIdx
-            ? 'bg-blue-200 text-blue-800'
-            : 'bg-slate-200 text-slate-500'
-        }`;
-        dot.innerHTML = content;
-        bar.appendChild(dot);
-      });
-    }
-
-    function updateBeadView() {
-      const cur = beadSequence[currentBeadIdx];
-      if (!cur) return;
-
-      document.getElementById('rosaryBeadBadge').innerHTML = `<i class="fa-solid ${cur.type === 'cross' ? 'fa-cross' : 'fa-circle-dot'}"></i> ${cur.badge}`;
-      document.getElementById('currentBeadNumberText').textContent = currentBeadIdx + 1;
-      document.getElementById('totalBeadNumberText').textContent = beadSequence.length;
-      document.getElementById('beadGuideTitle').textContent = cur.guide;
+      document.getElementById('rosaryStepBadge').innerHTML = `<i class="fa-solid ${cur.type === 'cross' ? 'fa-cross' : cur.type === 'salve' ? 'fa-crown' : 'fa-circle-dot'}"></i> ${cur.badge}`;
+      document.getElementById('rosaryCurrentIdxText').textContent = currentBeadIdx + 1;
+      document.getElementById('rosaryTotalBeadsText').textContent = seq.length;
+      document.getElementById('beadGuideTitle').textContent = cur.title;
       document.getElementById('beadPrayerName').textContent = cur.name;
-      document.getElementById('beadPrayerBox').innerText = cur.text;
+      document.getElementById('beadPrayerBox').innerText = cur.body;
 
-      const tapBtn = document.getElementById('mainTapBtn');
-      const tapLabel = document.getElementById('mainTapBtnLabel');
+      const tapBtn = document.getElementById('mainBeadTapBtn');
+      const tapLabel = document.getElementById('mainBeadTapLabel');
 
-      if (currentBeadIdx === beadSequence.length - 1) {
-        tapLabel.textContent = '묵주기도 완송! (처음으로 가기)';
-        tapBtn.className = 'w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-sm sm:text-base shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition-transform flex items-center justify-center gap-2';
+      if (currentBeadIdx === seq.length - 1) {
+        tapLabel.textContent = '묵주기도 완송! (마침 성호경 완료)';
+        tapBtn.className = 'w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-sm sm:text-base shadow-lg shadow-emerald-500/25 active:scale-[0.98] transition-transform flex items-center justify-center gap-2';
       } else {
-        tapLabel.textContent = `다음 묵주알로 넘어가기 (${currentBeadIdx + 1} / ${beadSequence.length})`;
-        tapBtn.className = 'w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-sm sm:text-base shadow-lg shadow-blue-500/20 active:scale-[0.98] transition-transform flex items-center justify-center gap-2';
+        tapLabel.textContent = `다음 묵주알 넘기기 (${currentBeadIdx + 1} / ${seq.length})`;
+        tapBtn.className = 'w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold text-sm sm:text-base shadow-lg shadow-indigo-500/25 active:scale-[0.98] transition-transform flex items-center justify-center gap-2';
       }
 
-      // 단 퀵버튼 하이라이트
-      const decNum = cur.decadeNum || 0;
+      // 1~5단 빠른 점프 버튼 하이라이트
+      const dGroup = cur.decadeGroup;
       for (let i = 0; i <= 5; i++) {
-        const btn = document.getElementById(`quickBtn${i}`);
+        const btn = document.getElementById(`btnDecade${i}`);
         if (btn) {
-          if (i === decNum) {
-            btn.className = 'py-1 rounded-lg bg-blue-600 text-white transition-colors shadow-2xs font-bold';
+          if (i === dGroup) {
+            btn.className = 'decade-quick-btn text-[11px] py-1 px-2 rounded-lg font-semibold bg-indigo-600 text-white shadow-xs';
           } else {
-            btn.className = 'py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors font-medium';
+            btn.className = 'decade-quick-btn text-[11px] py-1 px-2 rounded-lg font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200';
           }
         }
       }
 
-      renderBeadChain();
+      renderBeadChainBar(seq);
 
-      const activeDot = document.getElementById(`bead-dot-${currentBeadIdx}`);
+      const activeDot = document.getElementById(`chain-dot-${currentBeadIdx}`);
       if (activeDot) {
         activeDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
       }
     }
 
+    function renderBeadChainBar(seq) {
+      const bar = document.getElementById('beadChainBar');
+      bar.innerHTML = '';
+
+      seq.forEach((item, idx) => {
+        const dot = document.createElement('button');
+        dot.onclick = () => jumpToBead(idx);
+        dot.id = `chain-dot-${idx}`;
+        
+        let sizeClass = 'w-4 h-4 text-[9px]';
+        let iconHtml = `${idx + 1}`;
+        if (item.type === 'cross') {
+          sizeClass = 'w-6 h-6 text-[10px] font-bold';
+          iconHtml = '<i class="fa-solid fa-cross"></i>';
+        } else if (item.type === 'large') {
+          sizeClass = 'w-5 h-5 text-[10px] font-bold';
+          iconHtml = `${item.decadeGroup}단`;
+        } else if (item.type === 'chain') {
+          sizeClass = 'w-4 h-4 text-[9px]';
+          iconHtml = '<i class="fa-solid fa-link text-[8px]"></i>';
+        } else if (item.type === 'salve') {
+          sizeClass = 'w-6 h-6 text-[10px] font-bold';
+          iconHtml = '<i class="fa-solid fa-crown"></i>';
+        }
+
+        dot.className = `shrink-0 rounded-full flex items-center justify-center transition-all ${sizeClass} ${
+          idx === currentBeadIdx
+            ? 'bg-indigo-600 text-white font-bold ring-2 ring-indigo-300 ring-offset-1 scale-110'
+            : idx < currentBeadIdx
+            ? 'bg-indigo-200 text-indigo-800'
+            : 'bg-slate-200 text-slate-500'
+        }`;
+        dot.innerHTML = iconHtml;
+        bar.appendChild(dot);
+      });
+    }
+
+    function jumpToDecade(decadeNum) {
+      const targetIndices = [0, 6, 18, 30, 42, 54];
+      jumpToBead(targetIndices[decadeNum]);
+    }
+
+    function jumpToSalveRegina() {
+      const seq = buildBeadSequence();
+      jumpToBead(seq.length - 1);
+      showToast('마침 기도(성모 찬송)로 이동했습니다.');
+    }
+
     function nextBead() {
-      if (currentBeadIdx < beadSequence.length - 1) {
+      const seq = buildBeadSequence();
+      if (currentBeadIdx < seq.length - 1) {
         currentBeadIdx++;
         triggerHaptic(35);
-        updateBeadView();
+        updateBeadDisplay();
       } else {
         triggerHaptic(80);
-        showToast('묵주기도를 정성껏 마쳤습니다. 처음으로 돌아갑니다.');
-        currentBeadIdx = 0;
-        updateBeadView();
+        showToast('성모 찬송과 마침 성호경까지 묵주기도를 정성껏 마쳤습니다. 아멘.');
       }
     }
 
@@ -481,158 +511,127 @@
       if (currentBeadIdx > 0) {
         currentBeadIdx--;
         triggerHaptic(25);
-        updateBeadView();
+        updateBeadDisplay();
       }
     }
 
     function jumpToBead(idx) {
       currentBeadIdx = idx;
       triggerHaptic(30);
-      updateBeadView();
+      updateBeadDisplay();
     }
 
-    function resetBeads() {
+    function resetBeadProgress() {
       currentBeadIdx = 0;
       triggerHaptic(30);
-      updateBeadView();
-      showToast('처음 십자가 위치로 이동했습니다.');
+      updateBeadDisplay();
+      showToast('묵주를 처음 십자가 위치로 돌렸습니다.');
     }
 
-    // 1단 ~ 5단 시작 큰 알 위치로 점프
-    function jumpToDecadeIndex(targetDecade) {
-      if (targetDecade === 0) {
-        jumpToBead(0);
-        return;
-      }
-      const foundIdx = beadSequence.findIndex(b => b.type === 'large' && b.decadeNum === targetDecade);
-      if (foundIdx !== -1) {
-        jumpToBead(foundIdx);
-      }
-    }
-
-    function onMysteryChange() {
+    function selectMystery(mName) {
+      selectedMystery = mName;
       currentBeadIdx = 0;
-      buildBeadSequence();
-      updateBeadView();
-      renderFullTextAccordion();
-      const sel = document.getElementById('selectMystery').value;
-      showToast(`${sel === '전체' ? '20단 연속 완송' : sel + '의 신비'}로 변경되었습니다.`);
-    }
 
-    function renderFullTextAccordion() {
-      const container = document.getElementById('fullTextAccordionList');
-      const selected = document.getElementById('selectMystery').value;
-      const mysteries = (selected === '전체') ? ["환희", "빛", "고통", "영광"] : [selected];
-
-      let html = `
-        <details class="group bg-white rounded-2xl border border-slate-200 p-3.5 shadow-2xs" open>
-          <summary class="font-bold text-xs cursor-pointer text-slate-800 flex justify-between items-center">
-            <span>시작 기도 (사도신경, 주님의 기도, 성모송 3번, 영광송, 구원송)</span>
-            <i class="fa-solid fa-chevron-down text-slate-400 group-open:rotate-180 transition-transform text-[10px]"></i>
-          </summary>
-          <div class="text-xs text-slate-600 mt-2.5 space-y-2 border-t border-slate-100 pt-2 whitespace-pre-line leading-relaxed">
-            <p><strong>사도신경</strong><br>${PRAYER_TEXTS.signOfCross}\n${PRAYER_TEXTS.apostlesCreed}</p>
-            <p class="pt-1 border-t border-slate-100"><strong>주님의 기도</strong><br>${PRAYER_TEXTS.lordsPrayer}</p>
-            <p class="pt-1 border-t border-slate-100"><strong>성모송 (3번)</strong><br>${PRAYER_TEXTS.hailMary}</p>
-            <p class="pt-1 border-t border-slate-100"><strong>영광송 · 구원송</strong><br>${PRAYER_TEXTS.gloryBe}\n\n[구원송]\n${PRAYER_TEXTS.fatimaPrayer}</p>
-          </div>
-        </details>
-      `;
-
-      mysteries.forEach((mKey) => {
-        const mInfo = MYSTERY_DATA[mKey];
-        html += `
-          <div class="pt-2">
-            <span class="text-xs font-extrabold text-blue-900 px-1">🕊️ ${mInfo.name} 5단</span>
-          </div>
-        `;
-
-        mInfo.decades.forEach((dec) => {
-          html += `
-            <details class="group bg-white rounded-2xl border border-slate-200 p-3.5 shadow-2xs" open>
-              <summary class="font-bold text-xs cursor-pointer text-slate-800 flex justify-between items-center">
-                <span>${dec.title}</span>
-                <i class="fa-solid fa-chevron-down text-slate-400 group-open:rotate-180 transition-transform text-[10px]"></i>
-              </summary>
-              <div class="text-xs text-slate-600 mt-2.5 space-y-2 border-t border-slate-100 pt-2 leading-relaxed">
-                <p class="font-semibold text-blue-700">${dec.announce}</p>
-                <p class="bg-blue-50/70 p-2 rounded-lg text-slate-700">📖 ${dec.scripture}</p>
-                <p class="text-slate-500">○ 주님의 기도 1번 ➔ ○ 성모송 10번 ➔ ○ 영광송 및 구원송 각 1번</p>
-              </div>
-            </details>
-          `;
-        });
+      const tabs = document.querySelectorAll('.mystery-tab');
+      tabs.forEach(t => {
+        t.className = 'mystery-tab py-1.5 rounded-lg transition-all bg-white text-slate-600 hover:bg-slate-200';
       });
 
-      html += `
-        <details class="group bg-white rounded-2xl border border-slate-200 p-3.5 shadow-2xs" open>
-          <summary class="font-bold text-xs cursor-pointer text-slate-800 flex justify-between items-center">
-            <span>마침 기도 (성모 찬송 및 마침 성호경)</span>
-            <i class="fa-solid fa-chevron-down text-slate-400 group-open:rotate-180 transition-transform text-[10px]"></i>
-          </summary>
-          <div class="text-xs text-slate-600 mt-2.5 space-y-1.5 border-t border-slate-100 pt-2 whitespace-pre-line leading-relaxed">
-            <p>${PRAYER_TEXTS.hailHolyQueen}</p>
-            <p class="pt-1 font-bold text-blue-900">╋ 성부와 성자와 성령의 이름으로. 아멘.</p>
-          </div>
-        </details>
-      `;
-
-      container.innerHTML = html;
-    }
-
-    function toggleModeView() {
-      const touchView = document.getElementById('rosaryTouchView');
-      const fullTextView = document.getElementById('rosaryFullTextView');
-      const btn = document.getElementById('btnToggleMode');
-
-      if (currentMode === 'touch') {
-        currentMode = 'text';
-        touchView.classList.add('hidden');
-        fullTextView.classList.remove('hidden');
-        btn.textContent = '손안의 알';
-        btn.className = 'text-xs px-2.5 py-1.5 bg-blue-600 text-white font-bold rounded-lg transition-colors';
-      } else {
-        currentMode = 'touch';
-        fullTextView.classList.add('hidden');
-        touchView.classList.remove('hidden');
-        btn.textContent = '전체문';
-        btn.className = 'text-xs px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg transition-colors';
+      const activeTab = document.getElementById(`tab-${mName}`);
+      if (activeTab) {
+        activeTab.className = 'mystery-tab py-1.5 rounded-lg transition-all bg-indigo-600 text-white shadow-xs font-bold';
       }
+
+      updateBeadDisplay();
+      renderFullListMode();
+      showToast(`${mName === '전체20단' ? '전체 20단 완송 모드' : mName + '의 신비 (5단)'}로 변경되었습니다.`);
     }
 
-    function adjustFontSize(delta) {
-      currentFontSize = Math.max(11, Math.min(18, currentFontSize + delta));
-      document.getElementById('beadPrayerBox').style.fontSize = `${currentFontSize}px`;
-      document.getElementById('beadPrayerBox').style.lineHeight = `${currentFontSize * 1.65}px`;
+    function renderFullListMode() {
+      document.getElementById('listApostlesCreed').innerText = PRAYER_TEXTS.apostles;
+      document.getElementById('listLordsPrayer').innerText = PRAYER_TEXTS.lords;
+      document.getElementById('listHailMary').innerText = PRAYER_TEXTS.hailMary;
+      document.getElementById('listGloryFatima').innerText = `${PRAYER_TEXTS.glory}\n\n[구원송]\n${PRAYER_TEXTS.fatima}`;
+      document.getElementById('listSalveRegina').innerText = PRAYER_TEXTS.salveRegina;
+
+      const container = document.getElementById('listDecadesContainer');
+      container.innerHTML = '';
+
+      const mysteries = (selectedMystery === "전체20단") ? ["환희", "빛", "고통", "영광"] : [selectedMystery];
+
+      mysteries.forEach((m) => {
+        const decades = MYSTERY_DATA[m];
+        decades.forEach((dec, idx) => {
+          const dNum = idx + 1;
+          const det = document.createElement('details');
+          det.className = 'group bg-slate-50 rounded-xl border border-slate-200 p-3';
+          det.open = (m === selectedMystery && dNum <= 2);
+
+          det.innerHTML = `
+            <summary class="font-bold text-xs cursor-pointer text-slate-800 flex justify-between items-center">
+              <span>${m}의 신비 제 ${dNum}단</span>
+              <i class="fa-solid fa-chevron-down text-slate-400 group-open:rotate-180 transition-transform text-[10px]"></i>
+            </summary>
+            <div class="text-xs text-slate-600 mt-2 leading-relaxed space-y-1.5 border-t border-slate-200/60 pt-2">
+              <p class="font-bold text-indigo-700">${dec}</p>
+              <p>○ 주님의 기도 1번</p>
+              <p>○ 성모송 10번</p>
+              <p>○ 영광송 및 구원송 각 1번</p>
+            </div>
+          `;
+          container.appendChild(det);
+        });
+      });
+    }
+
+    function switchViewMode(mode) {
+      const handView = document.getElementById('rosaryHandView');
+      const listView = document.getElementById('rosaryListView');
+      const btnHand = document.getElementById('viewBtnHand');
+      const btnList = document.getElementById('viewBtnList');
+
+      if (mode === 'hand') {
+        handView.classList.remove('hidden');
+        listView.classList.add('hidden');
+        btnHand.className = 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-indigo-700 shadow-2xs';
+        btnList.className = 'px-2 py-0.5 rounded-md text-[10px] font-bold text-slate-500 hover:text-slate-800';
+      } else {
+        handView.classList.add('hidden');
+        listView.classList.remove('hidden');
+        btnList.className = 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-indigo-700 shadow-2xs';
+        btnHand.className = 'px-2 py-0.5 rounded-md text-[10px] font-bold text-slate-500 hover:text-slate-800';
+        renderFullListMode();
+      }
     }
 
     function setTodayRecommendedMystery() {
       const day = new Date().getDay(); // 0: 일, 1: 월, 2: 화, 3: 수, 4: 목, 5: 금, 6: 토
-      let recKey = "환희";
-      let dayName = "";
+      let rec = "환희";
+      let dayName = "월";
 
       if (day === 1 || day === 6) {
-        recKey = "환희";
-        dayName = (day === 1) ? "월요일" : "토요일";
+        rec = "환희";
+        dayName = (day === 1) ? "월" : "토";
       } else if (day === 4) {
-        recKey = "빛";
-        dayName = "목요일";
+        rec = "빛";
+        dayName = "목";
       } else if (day === 2 || day === 5) {
-        recKey = "고통";
-        dayName = (day === 2) ? "화요일" : "금요일";
-      } else {
-        recKey = "영광";
-        dayName = (day === 0) ? "주일(일)" : "수요일";
+        rec = "고통";
+        dayName = (day === 2) ? "화" : "금";
+      } else if (day === 0 || day === 3) {
+        rec = "영광";
+        dayName = (day === 0) ? "일" : "수";
       }
 
-      document.getElementById('todayRecommendText').textContent = `오늘 ${dayName} 권장: ${recKey}의 신비 5단`;
-      document.getElementById('selectMystery').value = recKey;
+      document.getElementById('todayMysteryRecommendation').textContent = `오늘(${dayName}요일)의 신비: ${rec}의 신비`;
+      selectMystery(rec);
     }
 
-    function triggerHaptic(duration = 35) {
-      if ('vibrate' in navigator) {
-        try { navigator.vibrate(duration); } catch (e) {}
-      }
+    function adjustFontSize(delta) {
+      textFontSize = Math.max(11, Math.min(18, textFontSize + delta));
+      const box = document.getElementById('beadPrayerBox');
+      box.style.fontSize = `${textFontSize}px`;
+      box.style.lineHeight = `${textFontSize * 1.65}px`;
     }
 
     function openGuideModal() {
@@ -641,6 +640,12 @@
 
     function closeGuideModal() {
       document.getElementById('guideModal').classList.add('hidden');
+    }
+
+    function triggerHaptic(duration = 35) {
+      if ('vibrate' in navigator) {
+        try { navigator.vibrate(duration); } catch (e) {}
+      }
     }
 
     function showToast(msg) {
@@ -657,9 +662,8 @@
     // 초기화
     window.addEventListener('DOMContentLoaded', () => {
       setTodayRecommendedMystery();
-      buildBeadSequence();
-      updateBeadView();
-      renderFullTextAccordion();
+      updateBeadDisplay();
+      renderFullListMode();
     });
   </script>
 </body>
