@@ -1,0 +1,687 @@
+<!-- ... existing code ... -->
+  <style>
+    body {
+      font-family: 'Noto Serif KR', serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* A4 실제 규격 시뮬레이션 (210mm x 296mm) */
+    .a4-sheet {
+      box-sizing: border-box;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s ease-in-out;
+    }
+
+    /* 모드 1: A4 전면 1장 (세로) */
+    .layout-single {
+      width: 210mm;
+      height: 296mm;
+      max-height: 296mm;
+    }
+
+    /* 모드 2: A4 1장에 A5 2장 (가로 2분할) */
+    .layout-dual-container {
+      width: 297mm;
+      height: 209mm;
+      max-height: 209mm;
+      display: flex;
+      flex-direction: row;
+      background: white;
+    }
+
+    .a5-card {
+      width: 50%;
+      height: 100%;
+      box-sizing: border-box;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* 가운데 절취선 및 가위 기호 */
+    .cut-guide-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      border-left: 1px dashed #94a3b8;
+      z-index: 30;
+      pointer-events: none;
+    }
+    .cut-guide-icon {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 2px 4px;
+      font-size: 11px;
+      color: #94a3b8;
+      z-index: 31;
+      border-radius: 4px;
+      border: 1px solid #e2e8f0;
+      pointer-events: none;
+    }
+
+    /* 테마별 색상 설정 */
+    .theme-cream {
+      background-color: #faf7f2;
+      color: #2b2623;
+    }
+<!-- ... existing code ... -->
+    .theme-burgundy .sub-text {
+      color: #b08d8d;
+    }
+
+    /* 인쇄 전용 설정 (동적 모드별 portrait / landscape 자동 처리) */
+    @media print {
+      body {
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      
+      body.mode-single {
+        @page {
+          size: A4 portrait;
+          margin: 0;
+        }
+      }
+      body.mode-dual {
+        @page {
+          size: A4 landscape;
+          margin: 0;
+        }
+      }
+
+      .a4-sheet, .layout-dual-container {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        page-break-after: avoid !important;
+        page-break-inside: avoid !important;
+      }
+
+      .layout-single {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
+      }
+
+      .layout-dual-container {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
+      }
+    }
+
+    /* 편집 포커스 스타일 */
+    [contenteditable="true"]:focus {
+      outline: none;
+      background-color: rgba(217, 119, 6, 0.05);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen flex flex-col text-slate-800 antialiased py-6 print:p-0 mode-dual">
+
+  <!-- 상단 제어 바 (인쇄 시 자동 숨김) -->
+  <header class="no-print max-w-5xl w-full mx-auto mb-6 px-4">
+    <div class="bg-white/95 backdrop-blur shadow-md rounded-2xl p-4 border border-slate-200 flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- 안내 -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-700/10 text-amber-800 flex items-center justify-center font-bold text-lg">
+          ✝
+        </div>
+        <div>
+          <h1 class="text-base font-bold text-slate-800 leading-snug">전민동성당 바자회 준비기도</h1>
+          <p class="text-xs text-slate-500">A4 1장 전면 또는 A5 2개 분할 출력 지원 · 자동 동기화</p>
+        </div>
+      </div>
+
+      <!-- 조작 도구 -->
+      <div class="flex flex-wrap items-center gap-3">
+
+        <!-- 인쇄 규격 선택 (A4 1장 vs A5 2개 분할) -->
+        <div class="flex items-center bg-amber-50/80 rounded-xl p-1 border border-amber-200/80 text-xs font-semibold">
+          <button onclick="setLayout('dual')" id="btn-layout-dual" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-amber-800 text-white shadow-sm transition-all">
+            <span>A5 × 2개 (A4 1장)</span>
+          </button>
+          <button onclick="setLayout('single')" id="btn-layout-single" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-amber-950 hover:text-amber-800 transition-all">
+            <span>A4 전면 (1개)</span>
+          </button>
+        </div>
+        
+        <!-- 글자 크기 슬라이더 -->
+        <div class="flex items-center bg-slate-50 rounded-xl px-3 py-1.5 border border-slate-200 text-xs">
+          <label for="fontSizeRange" class="text-slate-600 font-medium mr-2 whitespace-nowrap">글자 크기</label>
+          <input id="fontSizeRange" type="range" min="10" max="20" value="12" step="0.5" 
+                 class="w-20 accent-amber-700 cursor-pointer" oninput="changeFontSize(this.value)">
+          <span id="fontSizeDisplay" class="ml-2 font-mono text-slate-500 w-10 text-right">12.0px</span>
+        </div>
+
+        <!-- 배경 테마 -->
+        <div class="flex items-center bg-slate-50 rounded-xl p-1 border border-slate-200 text-xs">
+          <button onclick="setTheme('theme-cream')" id="btn-cream" class="px-2.5 py-1 rounded-lg font-medium bg-white text-slate-800 shadow-sm transition-all">양피지</button>
+          <button onclick="setTheme('theme-white')" id="btn-white" class="px-2.5 py-1 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition-all">순백색</button>
+          <button onclick="setTheme('theme-burgundy')" id="btn-burgundy" class="px-2.5 py-1 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition-all">전례적색</button>
+        </div>
+
+        <!-- 텍스트 복사 버튼 -->
+        <button onclick="copyPrayerText()" class="inline-flex items-center space-x-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition shadow-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path>
+          </svg>
+          <span>글 복사</span>
+        </button>
+
+        <!-- 인쇄 버튼 -->
+        <button onclick="triggerPrint()" class="inline-flex items-center space-x-2 px-4 py-2 bg-amber-800 hover:bg-amber-900 text-white rounded-xl text-xs font-bold transition shadow-sm hover:shadow active:scale-95">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+          </svg>
+          <span id="printBtnText">A4 가로 인쇄</span>
+        </button>
+
+      </div>
+    </div>
+  </header>
+<!-- ... existing code ... -->
+  <!-- 메인 A4 인쇄용 시트 컨테이너 -->
+  <main class="flex-grow flex items-center justify-center print:m-0 print:p-0 overflow-x-auto p-4">
+
+    <!-- 1. [A5 2개 분할 모드] (기본값) -->
+    <div id="dualView" class="layout-dual-container theme-cream shadow-2xl rounded-sm relative transition-all duration-300">
+      
+      <!-- 가운데 절취 가이드선 및 가위 아이콘 -->
+      <div class="cut-guide-line"></div>
+      <div class="cut-guide-icon flex items-center space-x-1 shadow-sm">
+        <span>✂</span>
+        <span class="text-[9px] font-sans">반으로 자르는 선</span>
+      </div>
+
+      <!-- 좌측 A5 카드 (원본 마스터) -->
+      <div class="a5-card px-8 py-7 border-r border-transparent">
+        <div class="sheet-border absolute inset-3 border-2 rounded pointer-events-none transition-colors duration-300"></div>
+        <div class="sheet-inner-border absolute inset-4 border border-dashed rounded pointer-events-none transition-colors duration-300"></div>
+        
+        <div class="accent-text absolute top-5 left-5 text-[10px] select-none opacity-80">✠</div>
+        <div class="accent-text absolute top-5 right-5 text-[10px] select-none opacity-80">✠</div>
+        <div class="accent-text absolute bottom-5 left-5 text-[10px] select-none opacity-80">✠</div>
+        <div class="accent-text absolute bottom-5 right-5 text-[10px] select-none opacity-80">✠</div>
+
+        <!-- 상단 헤더 -->
+        <div class="relative z-10 pt-1 text-center">
+          <div class="flex items-center justify-center space-x-1.5 mb-1">
+            <span class="accent-text text-[8px] opacity-60">✦</span>
+            <svg class="w-4 h-4 accent-text opacity-90" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M11 2h2v6h5v2h-5v12h-2V10H6V8h5V2z"/>
+            </svg>
+            <span class="accent-text text-[8px] opacity-60">✦</span>
+          </div>
+          <p class="accent-text text-[9px] uppercase tracking-[0.24em] font-medium mb-0.5 opacity-85">
+            Jeonmin Catholic Church · Bazaar Prayer
+          </p>
+          <h2 class="text-base font-bold tracking-tight text-slate-900">
+            전민동성당 바자회 준비기도
+          </h2>
+          <div class="flex items-center justify-center mt-1.5 space-x-1.5">
+            <div class="h-px w-8 bg-current opacity-25"></div>
+            <span class="text-[7px] accent-text opacity-60">✠</span>
+            <div class="h-px w-8 bg-current opacity-25"></div>
+          </div>
+        </div>
+
+        <!-- 기도문 본문 -->
+        <div class="relative z-10 max-w-sm mx-auto w-full my-auto px-1">
+          <div class="prayer-content text-left tracking-normal font-normal text-slate-800 transition-all duration-200" style="font-size: 12px; line-height: 1.85;">
+            
+            <div class="mb-3">
+              <p>자비로우신 주 하느님</p>
+              <p>저희가 한마음으로 정성을 모아</p>
+              <p>베풀어주신 은혜에 감사하는</p>
+              <p>나눔의 잔치를 준비하게 하셨으니 찬미받으소서</p>
+            </div>
+
+            <div class="mb-3">
+              <p>주님 간절히 청하오니</p>
+              <p>이 친교를 통하여 저희가 서로의 부족함을 너그럽게 품어 안으며</p>
+              <p>그리스도 안에서 참된 일치를 이루게 하시고</p>
+              <p class="font-medium">봉사하는 손길마다 기쁨을</p>
+              <p class="font-medium">찾아오는 발길마다 평화를 가득 내려주소서</p>
+            </div>
+
+            <div class="mb-3">
+              <p>그리하여 저희 안에 하나 된 형제애의 온기가</p>
+              <p>성당 문을 넘어 지역 사회와 온 이웃에게 고루 번져 나가게 하시며</p>
+              <p>이곳을 찾는 모든 이가 따뜻한 환대 속에서</p>
+              <p>저희의 작은 정성을 통해 살아계신 주님의 복음을 맛보게 하소서</p>
+            </div>
+
+            <div class="mb-3">
+              <p>우리 주 예수 그리스도를 통하여 비나이다</p>
+              <p class="font-bold text-stone-900 mt-0.5">아멘</p>
+            </div>
+
+            <div class="space-y-0.5 text-[11px] tracking-wide mb-2.5">
+              <div class="flex items-center space-x-1.5">
+                <span class="text-[10px] font-semibold opacity-75">○</span>
+                <span>성 토마스 사도여</span>
+              </div>
+              <div class="flex items-center space-x-1.5 font-medium">
+                <span class="response-symbol text-[10px] font-bold">●</span>
+                <span>저희를 위하여 빌어주소서</span>
+              </div>
+              <div class="flex items-center space-x-1.5 pt-0.5">
+                <span class="text-[10px] font-semibold opacity-75">○</span>
+                <span>한국의 모든 순교 성인들이여</span>
+              </div>
+              <div class="flex items-center space-x-1.5 font-medium">
+                <span class="response-symbol text-[10px] font-bold">●</span>
+                <span>저희를 위하여 빌어주소서</span>
+              </div>
+            </div>
+
+            <div>
+              <p class="font-medium text-[11.5px]">성부와 성자와 성령의 이름으로 아멘</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 하단 본당 서명 -->
+        <div class="relative z-10 text-center pb-1">
+          <p class="sub-text text-[10px] tracking-widest font-light select-none">전민동성당</p>
+        </div>
+      </div>
+
+      <!-- 우측 A5 카드 (좌측과 동일한 클론 카드) -->
+      <div id="rightA5Card" class="a5-card px-8 py-7">
+        <div class="sheet-border absolute inset-3 border-2 rounded pointer-events-none transition-colors duration-300"></div>
+        <div class="sheet-inner-border absolute inset-4 border border-dashed rounded pointer-events-none transition-colors duration-300"></div>
+        
+        <div class="accent-text absolute top-5 left-5 text-[10px] select-none opacity-80">✠</div>
+        <div class="accent-text absolute top-5 right-5 text-[10px] select-none opacity-80">✠</div>
+        <div class="accent-text absolute bottom-5 left-5 text-[10px] select-none opacity-80">✠</div>
+        <div class="accent-text absolute bottom-5 right-5 text-[10px] select-none opacity-80">✠</div>
+
+        <!-- 상단 헤더 -->
+        <div class="relative z-10 pt-1 text-center">
+          <div class="flex items-center justify-center space-x-1.5 mb-1">
+            <span class="accent-text text-[8px] opacity-60">✦</span>
+            <svg class="w-4 h-4 accent-text opacity-90" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M11 2h2v6h5v2h-5v12h-2V10H6V8h5V2z"/>
+            </svg>
+            <span class="accent-text text-[8px] opacity-60">✦</span>
+          </div>
+          <p class="accent-text text-[9px] uppercase tracking-[0.24em] font-medium mb-0.5 opacity-85">
+            Jeonmin Catholic Church · Bazaar Prayer
+          </p>
+          <h2 class="text-base font-bold tracking-tight text-slate-900">
+            전민동성당 바자회 준비기도
+          </h2>
+          <div class="flex items-center justify-center mt-1.5 space-x-1.5">
+            <div class="h-px w-8 bg-current opacity-25"></div>
+            <span class="text-[7px] accent-text opacity-60">✠</span>
+            <div class="h-px w-8 bg-current opacity-25"></div>
+          </div>
+        </div>
+
+        <!-- 기도문 본문 -->
+        <div class="relative z-10 max-w-sm mx-auto w-full my-auto px-1">
+          <div class="prayer-content text-left tracking-normal font-normal text-slate-800 transition-all duration-200" style="font-size: 12px; line-height: 1.85;">
+            
+            <div class="mb-3">
+              <p>자비로우신 주 하느님</p>
+              <p>저희가 한마음으로 정성을 모아</p>
+              <p>베풀어주신 은혜에 감사하는</p>
+              <p>나눔의 잔치를 준비하게 하셨으니 찬미받으소서</p>
+            </div>
+
+            <div class="mb-3">
+              <p>주님 간절히 청하오니</p>
+              <p>이 친교를 통하여 저희가 서로의 부족함을 너그럽게 품어 안으며</p>
+              <p>그리스도 안에서 참된 일치를 이루게 하시고</p>
+              <p class="font-medium">봉사하는 손길마다 기쁨을</p>
+              <p class="font-medium">찾아오는 발길마다 평화를 가득 내려주소서</p>
+            </div>
+
+            <div class="mb-3">
+              <p>그리하여 저희 안에 하나 된 형제애의 온기가</p>
+              <p>성당 문을 넘어 지역 사회와 온 이웃에게 고루 번져 나가게 하시며</p>
+              <p>이곳을 찾는 모든 이가 따뜻한 환대 속에서</p>
+              <p>저희의 작은 정성을 통해 살아계신 주님의 복음을 맛보게 하소서</p>
+            </div>
+
+            <div class="mb-3">
+              <p>우리 주 예수 그리스도를 통하여 비나이다</p>
+              <p class="font-bold text-stone-900 mt-0.5">아멘</p>
+            </div>
+
+            <div class="space-y-0.5 text-[11px] tracking-wide mb-2.5">
+              <div class="flex items-center space-x-1.5">
+                <span class="text-[10px] font-semibold opacity-75">○</span>
+                <span>성 토마스 사도여</span>
+              </div>
+              <div class="flex items-center space-x-1.5 font-medium">
+                <span class="response-symbol text-[10px] font-bold">●</span>
+                <span>저희를 위하여 빌어주소서</span>
+              </div>
+              <div class="flex items-center space-x-1.5 pt-0.5">
+                <span class="text-[10px] font-semibold opacity-75">○</span>
+                <span>한국의 모든 순교 성인들이여</span>
+              </div>
+              <div class="flex items-center space-x-1.5 font-medium">
+                <span class="response-symbol text-[10px] font-bold">●</span>
+                <span>저희를 위하여 빌어주소서</span>
+              </div>
+            </div>
+
+            <div>
+              <p class="font-medium text-[11.5px]">성부와 성자와 성령의 이름으로 아멘</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 하단 본당 서명 -->
+        <div class="relative z-10 text-center pb-1">
+          <p class="sub-text text-[10px] tracking-widest font-light select-none">전민동성당</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 2. [A4 전면 1장 모드] -->
+    <div id="singleView" class="a4-sheet layout-single theme-cream px-14 py-12 print:px-12 print:py-10 shadow-2xl rounded-sm transition-all duration-300 hidden">
+      
+      <!-- 외곽 테두리 및 귀퉁이 장식 -->
+      <div class="sheet-border absolute inset-4 border-2 rounded pointer-events-none transition-colors duration-300"></div>
+      <div class="sheet-inner-border absolute inset-6 border border-dashed rounded pointer-events-none transition-colors duration-300"></div>
+      
+      <div class="accent-text absolute top-7 left-7 text-xs select-none opacity-80">✠</div>
+      <div class="accent-text absolute top-7 right-7 text-xs select-none opacity-80">✠</div>
+      <div class="accent-text absolute bottom-7 left-7 text-xs select-none opacity-80">✠</div>
+      <div class="accent-text absolute bottom-7 right-7 text-xs select-none opacity-80">✠</div>
+
+      <!-- 상단 헤더 -->
+      <div class="relative z-10 pt-4 text-center">
+        <div class="flex items-center justify-center space-x-2 mb-2">
+          <span class="accent-text text-[10px] tracking-widest opacity-60">✦</span>
+          <svg class="w-6 h-6 accent-text transition-colors duration-300 opacity-90" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M11 2h2v6h5v2h-5v12h-2V10H6V8h5V2z"/>
+          </svg>
+          <span class="accent-text text-[10px] tracking-widest opacity-60">✦</span>
+        </div>
+        
+        <p class="accent-text text-[11px] uppercase tracking-[0.28em] font-medium mb-1.5 opacity-85">
+          Jeonmin Catholic Church · Bazaar Prayer
+        </p>
+
+        <h2 class="text-2xl font-bold tracking-tight text-slate-900">
+          전민동성당 바자회 준비기도
+        </h2>
+
+        <div class="flex items-center justify-center mt-3.5 space-x-2">
+          <div class="h-px w-12 bg-current opacity-25"></div>
+          <span class="text-[9px] accent-text opacity-60">✠</span>
+          <div class="h-px w-12 bg-current opacity-25"></div>
+        </div>
+      </div>
+
+      <!-- 기도문 본문 영역 -->
+      <div class="relative z-10 max-w-xl mx-auto w-full my-auto px-6">
+        <div class="prayer-content text-left tracking-normal font-normal text-slate-800 transition-all duration-200" style="font-size: 16px; line-height: 2.1;">
+          
+          <div class="mb-6 space-y-1">
+            <p>자비로우신 주 하느님</p>
+            <p>저희가 한마음으로 정성을 모아</p>
+            <p>베풀어주신 은혜에 감사하는</p>
+            <p>나눔의 잔치를 준비하게 하셨으니 찬미받으소서</p>
+          </div>
+
+          <div class="mb-6 space-y-1">
+            <p>주님 간절히 청하오니</p>
+            <p>이 친교를 통하여 저희가 서로의 부족함을 너그럽게 품어 안으며</p>
+            <p>그리스도 안에서 참된 일치를 이루게 하시고</p>
+            <p class="font-medium">봉사하는 손길마다 기쁨을</p>
+            <p class="font-medium">찾아오는 발길마다 평화를 가득 내려주소서</p>
+          </div>
+
+          <div class="mb-6 space-y-1">
+            <p>그리하여 저희 안에 하나 된 형제애의 온기가</p>
+            <p>성당 문을 넘어 지역 사회와 온 이웃에게 고루 번져 나가게 하시며</p>
+            <p>이곳을 찾는 모든 이가 따뜻한 환대 속에서</p>
+            <p>저희의 작은 정성을 통해 살아계신 주님의 복음을 맛보게 하소서</p>
+          </div>
+
+          <div class="mb-7">
+            <p>우리 주 예수 그리스도를 통하여 비나이다</p>
+            <p class="font-bold text-stone-900 mt-1">아멘</p>
+          </div>
+
+          <div class="space-y-1.5 text-[14.5px] tracking-wide mb-5">
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-semibold opacity-75">○</span>
+              <span>성 토마스 사도여</span>
+            </div>
+            <div class="flex items-center space-x-2 font-medium">
+              <span class="response-symbol text-xs font-bold transition-colors">●</span>
+              <span>저희를 위하여 빌어주소서</span>
+            </div>
+            <div class="flex items-center space-x-2 pt-1">
+              <span class="text-xs font-semibold opacity-75">○</span>
+              <span>한국의 모든 순교 성인들이여</span>
+            </div>
+            <div class="flex items-center space-x-2 font-medium">
+              <span class="response-symbol text-xs font-bold transition-colors">●</span>
+              <span>저희를 위하여 빌어주소서</span>
+            </div>
+          </div>
+
+          <div>
+            <p class="font-medium text-slate-800">
+              성부와 성자와 성령의 이름으로 아멘
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 하단부 서명 -->
+      <div class="relative z-10 text-center pb-2">
+        <p class="sub-text text-xs tracking-widest font-light select-none">
+          전민동성당
+        </p>
+      </div>
+
+    </div>
+
+  </main>
+  <!-- 토스트 알림창 -->
+  <div id="toastBox" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl text-sm font-medium transition-all duration-300 opacity-0 translate-y-4 pointer-events-none flex items-center space-x-2">
+    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+    </svg>
+    <span id="toastMsg">알림 메시지</span>
+  </div>
+
+  <script>
+    let currentLayout = 'dual'; // 'dual' | 'single'
+    let currentTheme = 'theme-cream';
+
+    // 인쇄 규격 레이아웃 변경 (dual: A5 x 2 / single: A4 x 1)
+    function setLayout(mode) {
+      currentLayout = mode;
+      const dualView = document.getElementById('dualView');
+      const singleView = document.getElementById('singleView');
+      const btnDual = document.getElementById('btn-layout-dual');
+      const btnSingle = document.getElementById('btn-layout-single');
+      const fontSlider = document.getElementById('fontSizeRange');
+      const fontDisplay = document.getElementById('fontSizeDisplay');
+      const printBtnText = document.getElementById('printBtnText');
+
+      if (mode === 'dual') {
+        document.body.classList.remove('mode-single');
+        document.body.classList.add('mode-dual');
+        dualView.classList.remove('hidden');
+        singleView.classList.add('hidden');
+
+        btnDual.className = 'flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-amber-800 text-white shadow-sm transition-all';
+        btnSingle.className = 'flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-amber-950 hover:text-amber-800 transition-all';
+
+        // A5 추천 글자 크기
+        fontSlider.min = '9';
+        fontSlider.max = '15';
+        fontSlider.value = '12';
+        fontDisplay.textContent = '12.0px';
+        printBtnText.textContent = 'A4 가로 2구 인쇄';
+        changeFontSize(12);
+        showToast('A4 1장에 A5 2개 분할 배치로 전환되었습니다.');
+      } else {
+        document.body.classList.remove('mode-dual');
+        document.body.classList.add('mode-single');
+        dualView.classList.add('hidden');
+        singleView.classList.remove('hidden');
+
+        btnSingle.className = 'flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-amber-800 text-white shadow-sm transition-all';
+        btnDual.className = 'flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-amber-950 hover:text-amber-800 transition-all';
+
+        // A4 추천 글자 크기
+        fontSlider.min = '13';
+        fontSlider.max = '20';
+        fontSlider.value = '16';
+        fontDisplay.textContent = '16.0px';
+        printBtnText.textContent = 'A4 세로 전면 인쇄';
+        changeFontSize(16);
+        showToast('A4 전면 1장 모드로 전환되었습니다.');
+      }
+    }
+
+    // 글자 크기 실시간 조절
+    function changeFontSize(val) {
+      const contents = document.querySelectorAll('.prayer-content');
+      const display = document.getElementById('fontSizeDisplay');
+      contents.forEach(content => {
+        content.style.fontSize = val + 'px';
+        if (currentLayout === 'dual') {
+          const lineHeight = Math.max(1.5, 1.95 - (val - 12) * 0.04);
+          content.style.lineHeight = lineHeight.toFixed(2);
+        } else {
+          const lineHeight = Math.max(1.7, 2.2 - (val - 16) * 0.05);
+          content.style.lineHeight = lineHeight.toFixed(2);
+        }
+      });
+      display.textContent = parseFloat(val).toFixed(1) + 'px';
+    }
+
+    // 배경 테마 전환
+    function setTheme(themeName) {
+      currentTheme = themeName;
+      const targets = [document.getElementById('dualView'), document.getElementById('singleView')];
+      targets.forEach(el => {
+        if (el) {
+          el.classList.remove('theme-cream', 'theme-white', 'theme-burgundy');
+          el.classList.add(themeName);
+        }
+      });
+
+      const themes = ['cream', 'white', 'burgundy'];
+      themes.forEach(t => {
+        const btn = document.getElementById(`btn-${t}`);
+        if (`theme-${t}` === themeName) {
+          btn.className = 'px-2.5 py-1 rounded-lg font-medium bg-white text-slate-900 shadow-sm transition-all';
+        } else {
+          btn.className = 'px-2.5 py-1 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition-all';
+        }
+      });
+    }
+
+    // 인쇄 트리거
+    function triggerPrint() {
+      window.print();
+    }
+
+    // 커스텀 토스트 알림
+    function showToast(msg) {
+      const toast = document.getElementById('toastBox');
+      const text = document.getElementById('toastMsg');
+      text.textContent = msg;
+      toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+      }, 2500);
+    }
+
+    // 클립보드 복사
+    function copyPrayerText() {
+      const prayerText = `전민동성당 바자회 준비기도
+
+자비로우신 주 하느님
+저희가 한마음으로 정성을 모아
+베풀어주신 은혜에 감사하는
+나눔의 잔치를 준비하게 하셨으니 찬미받으소서
+
+주님 간절히 청하오니
+이 친교를 통하여 저희가 서로의 부족함을 너그럽게 품어 안으며
+그리스도 안에서 참된 일치를 이루게 하시고
+봉사하는 손길마다 기쁨을
+찾아오는 발길마다 평화를 가득 내려주소서
+
+그리하여 저희 안에 하나 된 형제애의 온기가
+성당 문을 넘어 지역 사회와 온 이웃에게 고루 번져 나가게 하시며
+이곳을 찾는 모든 이가 따뜻한 환대 속에서
+저희의 작은 정성을 통해 살아계신 주님의 복음을 맛보게 하소서
+
+우리 주 예수 그리스도를 통하여 비나이다
+아멘
+
+○ 성 토마스 사도여
+● 저희를 위하여 빌어주소서
+○ 한국의 모든 순교 성인들이여
+● 저희를 위하여 빌어주소서
+
+성부와 성자와 성령의 이름으로 아멘
+
+전민동성당`;
+
+      const textarea = document.createElement('textarea');
+      textarea.value = prayerText;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      
+      try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+          showToast('기도문 전문이 클립보드에 복사되었습니다.');
+        } else {
+          showToast('복사에 실패했습니다. 직접 복사해주세요.');
+        }
+      } catch (err) {
+        showToast('복사 중 오류가 발생했습니다.');
+      }
+      document.body.removeChild(textarea);
+    }
+
+    // 페이지 진입 시 초기 설정
+    window.addEventListener('DOMContentLoaded', () => {
+      setLayout('dual');
+    });
+  </script>
+</body>
+</html>
