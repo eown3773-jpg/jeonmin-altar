@@ -136,25 +136,8 @@
       bottom: 0;
       left: 50%;
       width: 0;
-      border-left: 1px dashed #94a3b8;
+      border-left: 1px dashed #cbd5e1;
       z-index: 20;
-      pointer-events: none;
-    }
-
-    .cut-badge {
-      position: absolute;
-      top: 8px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #ffffff;
-      border: 1px solid #cbd5e1;
-      padding: 2px 8px;
-      font-size: 11px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      color: #64748b;
-      border-radius: 9999px;
-      z-index: 21;
-      white-space: nowrap;
       pointer-events: none;
     }
 
@@ -224,7 +207,7 @@
         padding: 0 !important;
       }
 
-      .no-print, #toast, .cut-badge {
+      .no-print, #toast {
         display: none !important;
       }
 
@@ -363,9 +346,8 @@
     <!-- 1. [A5 2개 분할 모드] (기본값) -->
     <div id="viewDual" class="sheet-paper layout-dual theme-cream">
       
-      <!-- 절취선 및 가위 라벨 -->
+      <!-- 절취선 (글자 배지 제거 완료) -->
       <div class="cut-line"></div>
-      <div class="cut-badge">✂ 자르는 선</div>
 
       <!-- 좌측 A5 카드 -->
       <div class="a5-card">
