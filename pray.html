@@ -32,7 +32,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 24px 16px;
+      padding: 28px 16px 40px 16px;
       overflow-x: auto;
       width: 100%;
     }
@@ -40,7 +40,7 @@
     /* 시트 공통 규격 */
     .sheet-paper {
       position: relative;
-      background-color: #ffffff;
+      background-color: #faf7f2;
       box-sizing: border-box;
       box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.12), 0 5px 15px -5px rgba(0, 0, 0, 0.06);
       border-radius: 2px;
@@ -59,7 +59,7 @@
     .a5-card {
       width: 50%;
       height: 100%;
-      padding: 26mm 20mm 18mm 20mm;
+      padding: 22mm 18mm 16mm 18mm;
       position: relative;
       display: flex;
       flex-direction: column;
@@ -81,7 +81,7 @@
 
     .cut-badge {
       position: absolute;
-      top: 10px;
+      top: 8px;
       left: 50%;
       transform: translateX(-50%);
       background-color: #ffffff;
@@ -100,7 +100,7 @@
     .layout-single {
       width: 210mm;
       height: 296mm;
-      padding: 30mm 24mm 22mm 24mm;
+      padding: 28mm 22mm 22mm 22mm;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -109,7 +109,7 @@
     /* 테두리 장식 */
     .sheet-outer-border {
       position: absolute;
-      inset: 10mm;
+      inset: 9mm;
       border-width: 1.5px;
       border-style: solid;
       pointer-events: none;
@@ -123,7 +123,7 @@
 
     .sheet-inner-border {
       position: absolute;
-      inset: 12mm;
+      inset: 11mm;
       border-width: 1px;
       border-style: dashed;
       pointer-events: none;
@@ -164,17 +164,7 @@
     .theme-white .response-dot { color: #b91c1c; }
     .theme-white .footer-text { color: #94a3b8; }
 
-    /* 3. 테마: 전례적색 */
-    .theme-burgundy {
-      background-color: #fdfbf8 !important;
-      color: #2a1f1f;
-    }
-    .theme-burgundy .sheet-outer-border { border-color: #8b3a3a; }
-    .theme-burgundy .sheet-inner-border { border-color: #e5cfcf; }
-    .theme-burgundy .accent-color { color: #8b3a3a; }
-    .theme-burgundy .response-dot { color: #8b3a3a; }
-    .theme-burgundy .footer-text { color: #ab8b8b; }
-
+    /* 인쇄 전용 스타일: 화면에서 보던 글자 크기와 줄 간격 그대로 실물 출력 */
     @media print {
       body {
         background: transparent !important;
@@ -230,19 +220,17 @@
 </head>
 <body class="mode-dual">
 
-  <!-- 깔끔하고 직관적으로 정돈된 상단 툴바 -->
+  <!-- 군더더기를 덜어내고 핵심만 남긴 깔끔한 상단 제어 바 -->
   <header class="no-print bg-white/95 backdrop-blur border-b border-slate-200 sticky top-0 z-50">
-    <div class="max-w-5xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+    <div class="max-w-4xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
       
       <!-- 성당 명칭 -->
       <div class="flex items-center space-x-2">
         <span class="text-amber-800 text-lg font-bold">✝</span>
-        <div>
-          <h1 class="text-sm font-bold text-slate-800 leading-tight">전민동성당 바자회 준비기도</h1>
-        </div>
+        <h1 class="text-sm font-bold text-slate-800 leading-tight">전민동성당 바자회 준비기도</h1>
       </div>
 
-      <!-- 직관적인 인쇄 규격 선택기 (심플 세그먼트) -->
+      <!-- 인쇄 규격 선택 (A5 2장 vs A4 1장) -->
       <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
         <button id="btnDual" onclick="switchLayout('dual')" 
                 class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg font-semibold text-xs transition-all bg-amber-800 text-white shadow-sm">
@@ -254,13 +242,12 @@
         </button>
       </div>
 
-      <!-- 우측 보조 도구 및 인쇄 버튼 -->
+      <!-- 보조 도구: 테마, 복사, 인쇄 -->
       <div class="flex items-center space-x-2">
-        
-        <!-- 테마 전환 (단순 탭) -->
+        <!-- 테마 전환 -->
         <div class="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs">
-          <button id="themeBtn-cream" onclick="applyTheme('theme-cream')" class="px-2 py-1 rounded bg-white text-slate-800 font-medium">양피지</button>
-          <button id="themeBtn-white" onclick="applyTheme('theme-white')" class="px-2 py-1 rounded text-slate-500 hover:text-slate-800">흰색</button>
+          <button id="themeBtn-cream" onclick="applyTheme('theme-cream')" class="px-2.5 py-1 rounded bg-white text-slate-800 font-medium shadow-xs">양피지</button>
+          <button id="themeBtn-white" onclick="applyTheme('theme-white')" class="px-2.5 py-1 rounded text-slate-500 hover:text-slate-800">흰색</button>
         </div>
 
         <!-- 텍스트 복사 -->
@@ -270,20 +257,20 @@
 
         <!-- 인쇄 실행 버튼 -->
         <button onclick="window.print()" class="px-4 py-1.5 bg-amber-800 hover:bg-amber-900 text-white rounded-lg text-xs font-bold shadow-sm transition flex items-center space-x-1.5 active:scale-95">
-          <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg style="width: 14px; height: 14px; display: inline-block;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
           </svg>
           <span id="printBtnText">인쇄하기</span>
         </button>
-
       </div>
+
     </div>
   </header>
 
   <!-- 메인 캔버스 뷰 -->
   <main class="preview-container">
 
-    <!-- 1. [A5 2개 분할 모드] (기본: A4 1장에 좌우 배치) -->
+    <!-- 1. [A5 2개 분할 모드] (기본: A4 가로 1장에 A5 2개 배치) -->
     <div id="viewDual" class="sheet-paper layout-dual theme-cream">
       
       <!-- 절취선 및 가위 라벨 -->
@@ -295,16 +282,16 @@
         <div class="sheet-outer-border"></div>
         <div class="sheet-inner-border"></div>
         
-        <span class="corner-cross accent-color" style="top: 14mm; left: 14mm;">✠</span>
-        <span class="corner-cross accent-color" style="top: 14mm; right: 14mm;">✠</span>
-        <span class="corner-cross accent-color" style="bottom: 14mm; left: 14mm;">✠</span>
-        <span class="corner-cross accent-color" style="bottom: 14mm; right: 14mm;">✠</span>
+        <span class="corner-cross accent-color" style="top: 13mm; left: 13mm;">✠</span>
+        <span class="corner-cross accent-color" style="top: 13mm; right: 13mm;">✠</span>
+        <span class="corner-cross accent-color" style="bottom: 13mm; left: 13mm;">✠</span>
+        <span class="corner-cross accent-color" style="bottom: 13mm; right: 13mm;">✠</span>
 
-        <!-- 헤더 -->
+        <!-- 헤더: 단아한 전례 장식과 제목 -->
         <div class="text-center relative z-10">
-          <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 2px;">
+          <div style="display: flex; align-items: center; justify-content: center; gap: 5px; margin-bottom: 2px;">
             <span class="accent-color" style="font-size: 8px; opacity: 0.6;">✦</span>
-            <svg style="width: 14px; height: 14px; display: inline-block;" class="accent-color" viewBox="0 0 24 24" fill="currentColor">
+            <svg style="width: 13px; height: 13px; display: inline-block;" class="accent-color" viewBox="0 0 24 24" fill="currentColor">
               <path d="M11 2h2v6h5v2h-5v12h-2V10H6V8h5V2z"/>
             </svg>
             <span class="accent-color" style="font-size: 8px; opacity: 0.6;">✦</span>
@@ -312,27 +299,27 @@
           <p class="accent-color" style="font-size: 8.5px; letter-spacing: 0.22em; font-weight: 600; text-transform: uppercase; margin-bottom: 3px; opacity: 0.85;">
             JEONMIN CATHOLIC CHURCH · BAZAAR PRAYER
           </p>
-          <h2 style="font-size: 16px; font-weight: 700; letter-spacing: -0.02em; color: inherit; line-height: 1.2;">
+          <h2 style="font-size: 15.5px; font-weight: 700; letter-spacing: -0.02em; color: inherit; line-height: 1.2;">
             전민동성당 바자회 준비기도
           </h2>
-          <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 5px;">
-            <span style="height: 1px; width: 28px; background-color: currentColor; opacity: 0.25;"></span>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 5px; margin-top: 4px;">
+            <span style="height: 1px; width: 26px; background-color: currentColor; opacity: 0.25;"></span>
             <span class="accent-color" style="font-size: 7px; opacity: 0.7;">✠</span>
-            <span style="height: 1px; width: 28px; background-color: currentColor; opacity: 0.25;"></span>
+            <span style="height: 1px; width: 26px; background-color: currentColor; opacity: 0.25;"></span>
           </div>
         </div>
 
-        <!-- 본문 (정갈한 좌측 정렬) -->
-        <div class="prayer-body" style="font-size: 12px; line-height: 1.85; margin-top: auto; margin-bottom: auto; text-align: left; padding-left: 2mm; padding-right: 2mm; position: relative; z-index: 10;">
+        <!-- 본문: A5 카드에 꼭 맞춘 편안한 11.5pt 글자 크기와 1.82 행간 -->
+        <div class="prayer-body" style="font-size: 11.5px; line-height: 1.82; margin-top: auto; margin-bottom: auto; text-align: left; padding-left: 1.5mm; padding-right: 1.5mm; position: relative; z-index: 10;">
           
-          <div style="margin-bottom: 9px;">
+          <div style="margin-bottom: 8px;">
             <p>자비로우신 주 하느님</p>
             <p>저희가 한마음으로 정성을 모아</p>
             <p>베풀어주신 은혜에 감사하는</p>
             <p>나눔의 잔치를 준비하게 하셨으니 찬미받으소서</p>
           </div>
 
-          <div style="margin-bottom: 9px;">
+          <div style="margin-bottom: 8px;">
             <p>주님 간절히 청하오니</p>
             <p>이 친교를 통하여 저희가 서로의 부족함을 너그럽게 품어 안으며</p>
             <p>그리스도 안에서 참된 일치를 이루게 하시고</p>
@@ -340,66 +327,66 @@
             <p style="font-weight: 600;">찾아오는 발길마다 평화를 가득 내려주소서</p>
           </div>
 
-          <div style="margin-bottom: 9px;">
+          <div style="margin-bottom: 8px;">
             <p>그리하여 저희 안에 하나 된 형제애의 온기가</p>
             <p>성당 문을 넘어 지역 사회와 온 이웃에게 고루 번져 나가게 하시며</p>
             <p>이곳을 찾는 모든 이가 따뜻한 환대 속에서</p>
             <p>저희의 작은 정성을 통해 살아계신 주님의 복음을 맛보게 하소서</p>
           </div>
 
-          <div style="margin-bottom: 9px;">
+          <div style="margin-bottom: 8px;">
             <p>우리 주 예수 그리스도를 통하여 비나이다</p>
             <p style="font-weight: 700; margin-top: 1px;">아멘</p>
           </div>
 
-          <div style="margin-bottom: 7px; font-size: 11px; line-height: 1.6;">
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <span style="font-size: 10px; opacity: 0.75;">○</span>
+          <div style="margin-bottom: 6px; font-size: 10.5px; line-height: 1.6;">
+            <div style="display: flex; align-items: center; gap: 5px;">
+              <span style="font-size: 9.5px; opacity: 0.75;">○</span>
               <span>성 토마스 사도여</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 6px; font-weight: 600;">
-              <span class="response-dot" style="font-size: 10px;">●</span>
+            <div style="display: flex; align-items: center; gap: 5px; font-weight: 600;">
+              <span class="response-dot" style="font-size: 9.5px;">●</span>
               <span>저희를 위하여 빌어주소서</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 6px; margin-top: 1px;">
-              <span style="font-size: 10px; opacity: 0.75;">○</span>
+            <div style="display: flex; align-items: center; gap: 5px; margin-top: 1px;">
+              <span style="font-size: 9.5px; opacity: 0.75;">○</span>
               <span>한국의 모든 순교 성인들이여</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 6px; font-weight: 600;">
-              <span class="response-dot" style="font-size: 10px;">●</span>
+            <div style="display: flex; align-items: center; gap: 5px; font-weight: 600;">
+              <span class="response-dot" style="font-size: 9.5px;">●</span>
               <span>저희를 위하여 빌어주소서</span>
             </div>
           </div>
 
           <div>
-            <p style="font-size: 11.5px; font-weight: 600;">성부와 성자와 성령의 이름으로 아멘</p>
+            <p style="font-size: 11px; font-weight: 600;">성부와 성자와 성령의 이름으로 아멘</p>
           </div>
 
         </div>
 
         <!-- 하단 본당 서명 -->
         <div class="text-center relative z-10" style="padding-bottom: 1mm;">
-          <p class="footer-text" style="font-size: 10.5px; letter-spacing: 0.2em; font-weight: 400; user-select: none;">
+          <p class="footer-text" style="font-size: 10px; letter-spacing: 0.22em; font-weight: 400; user-select: none;">
             전민동성당
           </p>
         </div>
       </div>
 
-      <!-- 우측 A5 카드 (동일 복제) -->
+      <!-- 우측 A5 카드 (좌측과 완전히 동일한 쌍둥이 카드) -->
       <div class="a5-card">
         <div class="sheet-outer-border"></div>
         <div class="sheet-inner-border"></div>
         
-        <span class="corner-cross accent-color" style="top: 14mm; left: 14mm;">✠</span>
-        <span class="corner-cross accent-color" style="top: 14mm; right: 14mm;">✠</span>
-        <span class="corner-cross accent-color" style="bottom: 14mm; left: 14mm;">✠</span>
-        <span class="corner-cross accent-color" style="bottom: 14mm; right: 14mm;">✠</span>
+        <span class="corner-cross accent-color" style="top: 13mm; left: 13mm;">✠</span>
+        <span class="corner-cross accent-color" style="top: 13mm; right: 13mm;">✠</span>
+        <span class="corner-cross accent-color" style="bottom: 13mm; left: 13mm;">✠</span>
+        <span class="corner-cross accent-color" style="bottom: 13mm; right: 13mm;">✠</span>
 
         <!-- 헤더 -->
         <div class="text-center relative z-10">
-          <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 2px;">
+          <div style="display: flex; align-items: center; justify-content: center; gap: 5px; margin-bottom: 2px;">
             <span class="accent-color" style="font-size: 8px; opacity: 0.6;">✦</span>
-            <svg style="width: 14px; height: 14px; display: inline-block;" class="accent-color" viewBox="0 0 24 24" fill="currentColor">
+            <svg style="width: 13px; height: 13px; display: inline-block;" class="accent-color" viewBox="0 0 24 24" fill="currentColor">
               <path d="M11 2h2v6h5v2h-5v12h-2V10H6V8h5V2z"/>
             </svg>
             <span class="accent-color" style="font-size: 8px; opacity: 0.6;">✦</span>
@@ -407,27 +394,27 @@
           <p class="accent-color" style="font-size: 8.5px; letter-spacing: 0.22em; font-weight: 600; text-transform: uppercase; margin-bottom: 3px; opacity: 0.85;">
             JEONMIN CATHOLIC CHURCH · BAZAAR PRAYER
           </p>
-          <h2 style="font-size: 16px; font-weight: 700; letter-spacing: -0.02em; color: inherit; line-height: 1.2;">
+          <h2 style="font-size: 15.5px; font-weight: 700; letter-spacing: -0.02em; color: inherit; line-height: 1.2;">
             전민동성당 바자회 준비기도
           </h2>
-          <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 5px;">
-            <span style="height: 1px; width: 28px; background-color: currentColor; opacity: 0.25;"></span>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 5px; margin-top: 4px;">
+            <span style="height: 1px; width: 26px; background-color: currentColor; opacity: 0.25;"></span>
             <span class="accent-color" style="font-size: 7px; opacity: 0.7;">✠</span>
-            <span style="height: 1px; width: 28px; background-color: currentColor; opacity: 0.25;"></span>
+            <span style="height: 1px; width: 26px; background-color: currentColor; opacity: 0.25;"></span>
           </div>
         </div>
 
-        <!-- 본문 (정갈한 좌측 정렬) -->
-        <div class="prayer-body" style="font-size: 12px; line-height: 1.85; margin-top: auto; margin-bottom: auto; text-align: left; padding-left: 2mm; padding-right: 2mm; position: relative; z-index: 10;">
+        <!-- 본문 -->
+        <div class="prayer-body" style="font-size: 11.5px; line-height: 1.82; margin-top: auto; margin-bottom: auto; text-align: left; padding-left: 1.5mm; padding-right: 1.5mm; position: relative; z-index: 10;">
           
-          <div style="margin-bottom: 9px;">
+          <div style="margin-bottom: 8px;">
             <p>자비로우신 주 하느님</p>
             <p>저희가 한마음으로 정성을 모아</p>
             <p>베풀어주신 은혜에 감사하는</p>
             <p>나눔의 잔치를 준비하게 하셨으니 찬미받으소서</p>
           </div>
 
-          <div style="margin-bottom: 9px;">
+          <div style="margin-bottom: 8px;">
             <p>주님 간절히 청하오니</p>
             <p>이 친교를 통하여 저희가 서로의 부족함을 너그럽게 품어 안으며</p>
             <p>그리스도 안에서 참된 일치를 이루게 하시고</p>
@@ -435,46 +422,46 @@
             <p style="font-weight: 600;">찾아오는 발길마다 평화를 가득 내려주소서</p>
           </div>
 
-          <div style="margin-bottom: 9px;">
+          <div style="margin-bottom: 8px;">
             <p>그리하여 저희 안에 하나 된 형제애의 온기가</p>
             <p>성당 문을 넘어 지역 사회와 온 이웃에게 고루 번져 나가게 하시며</p>
             <p>이곳을 찾는 모든 이가 따뜻한 환대 속에서</p>
             <p>저희의 작은 정성을 통해 살아계신 주님의 복음을 맛보게 하소서</p>
           </div>
 
-          <div style="margin-bottom: 9px;">
+          <div style="margin-bottom: 8px;">
             <p>우리 주 예수 그리스도를 통하여 비나이다</p>
             <p style="font-weight: 700; margin-top: 1px;">아멘</p>
           </div>
 
-          <div style="margin-bottom: 7px; font-size: 11px; line-height: 1.6;">
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <span style="font-size: 10px; opacity: 0.75;">○</span>
+          <div style="margin-bottom: 6px; font-size: 10.5px; line-height: 1.6;">
+            <div style="display: flex; align-items: center; gap: 5px;">
+              <span style="font-size: 9.5px; opacity: 0.75;">○</span>
               <span>성 토마스 사도여</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 6px; font-weight: 600;">
-              <span class="response-dot" style="font-size: 10px;">●</span>
+            <div style="display: flex; align-items: center; gap: 5px; font-weight: 600;">
+              <span class="response-dot" style="font-size: 9.5px;">●</span>
               <span>저희를 위하여 빌어주소서</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 6px; margin-top: 1px;">
-              <span style="font-size: 10px; opacity: 0.75;">○</span>
+            <div style="display: flex; align-items: center; gap: 5px; margin-top: 1px;">
+              <span style="font-size: 9.5px; opacity: 0.75;">○</span>
               <span>한국의 모든 순교 성인들이여</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 6px; font-weight: 600;">
-              <span class="response-dot" style="font-size: 10px;">●</span>
+            <div style="display: flex; align-items: center; gap: 5px; font-weight: 600;">
+              <span class="response-dot" style="font-size: 9.5px;">●</span>
               <span>저희를 위하여 빌어주소서</span>
             </div>
           </div>
 
           <div>
-            <p style="font-size: 11.5px; font-weight: 600;">성부와 성자와 성령의 이름으로 아멘</p>
+            <p style="font-size: 11px; font-weight: 600;">성부와 성자와 성령의 이름으로 아멘</p>
           </div>
 
         </div>
 
         <!-- 하단 본당 서명 -->
         <div class="text-center relative z-10" style="padding-bottom: 1mm;">
-          <p class="footer-text" style="font-size: 10.5px; letter-spacing: 0.2em; font-weight: 400; user-select: none;">
+          <p class="footer-text" style="font-size: 10px; letter-spacing: 0.22em; font-weight: 400; user-select: none;">
             전민동성당
           </p>
         </div>
@@ -482,19 +469,19 @@
 
     </div>
 
-    <!-- 2. [A4 전면 1장 모드] -->
+    <!-- 2. [A4 전면 1장 모드] (A4 세로 1장 전체에 여유롭고 큼직하게 배치) -->
     <div id="viewSingle" class="sheet-paper layout-single theme-cream" style="display: none;">
       
       <div class="sheet-outer-border"></div>
       <div class="sheet-inner-border"></div>
       
-      <span class="corner-cross accent-color" style="top: 18mm; left: 18mm; font-size: 13px;">✠</span>
-      <span class="corner-cross accent-color" style="top: 18mm; right: 18mm; font-size: 13px;">✠</span>
-      <span class="corner-cross accent-color" style="bottom: 18mm; left: 18mm; font-size: 13px;">✠</span>
-      <span class="corner-cross accent-color" style="bottom: 18mm; right: 18mm; font-size: 13px;">✠</span>
+      <span class="corner-cross accent-color" style="top: 17mm; left: 17mm; font-size: 13px;">✠</span>
+      <span class="corner-cross accent-color" style="top: 17mm; right: 17mm; font-size: 13px;">✠</span>
+      <span class="corner-cross accent-color" style="bottom: 17mm; left: 17mm; font-size: 13px;">✠</span>
+      <span class="corner-cross accent-color" style="bottom: 17mm; right: 17mm; font-size: 13px;">✠</span>
 
       <!-- 헤더 -->
-      <div class="text-center relative z-10" style="padding-top: 2mm;">
+      <div class="text-center relative z-10" style="padding-top: 3mm;">
         <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 4px;">
           <span class="accent-color" style="font-size: 10px; opacity: 0.6;">✦</span>
           <svg style="width: 22px; height: 22px; display: inline-block;" class="accent-color" viewBox="0 0 24 24" fill="currentColor">
@@ -518,17 +505,17 @@
         </div>
       </div>
 
-      <!-- 본문 -->
-      <div class="prayer-body" style="font-size: 16px; line-height: 2.1; margin-top: auto; margin-bottom: auto; text-align: left; max-width: 540px; margin-left: auto; margin-right: auto; width: 100%; position: relative; z-index: 10;">
+      <!-- 본문: A4 전면 1장에 가장 낭송하기 좋은 15.5px 글자와 2.05 행간 -->
+      <div class="prayer-body" style="font-size: 15.5px; line-height: 2.05; margin-top: auto; margin-bottom: auto; text-align: left; max-width: 530px; margin-left: auto; margin-right: auto; width: 100%; position: relative; z-index: 10;">
         
-        <div style="margin-bottom: 18px;">
+        <div style="margin-bottom: 16px;">
           <p>자비로우신 주 하느님</p>
           <p>저희가 한마음으로 정성을 모아</p>
           <p>베풀어주신 은혜에 감사하는</p>
           <p>나눔의 잔치를 준비하게 하셨으니 찬미받으소서</p>
         </div>
 
-        <div style="margin-bottom: 18px;">
+        <div style="margin-bottom: 16px;">
           <p>주님 간절히 청하오니</p>
           <p>이 친교를 통하여 저희가 서로의 부족함을 너그럽게 품어 안으며</p>
           <p>그리스도 안에서 참된 일치를 이루게 하시고</p>
@@ -536,19 +523,19 @@
           <p style="font-weight: 600;">찾아오는 발길마다 평화를 가득 내려주소서</p>
         </div>
 
-        <div style="margin-bottom: 18px;">
+        <div style="margin-bottom: 16px;">
           <p>그리하여 저희 안에 하나 된 형제애의 온기가</p>
           <p>성당 문을 넘어 지역 사회와 온 이웃에게 고루 번져 나가게 하시며</p>
           <p>이곳을 찾는 모든 이가 따뜻한 환대 속에서</p>
           <p>저희의 작은 정성을 통해 살아계신 주님의 복음을 맛보게 하소서</p>
         </div>
 
-        <div style="margin-bottom: 18px;">
+        <div style="margin-bottom: 16px;">
           <p>우리 주 예수 그리스도를 통하여 비나이다</p>
           <p style="font-weight: 700; margin-top: 2px;">아멘</p>
         </div>
 
-        <div style="margin-bottom: 16px; font-size: 14.5px; line-height: 1.75;">
+        <div style="margin-bottom: 14px; font-size: 14px; line-height: 1.75;">
           <div style="display: flex; align-items: center; gap: 8px;">
             <span style="font-size: 12px; opacity: 0.75;">○</span>
             <span>성 토마스 사도여</span>
@@ -568,7 +555,7 @@
         </div>
 
         <div>
-          <p style="font-size: 15px; font-weight: 600;">
+          <p style="font-size: 14.5px; font-weight: 600;">
             성부와 성자와 성령의 이름으로 아멘
           </p>
         </div>
@@ -576,7 +563,7 @@
       </div>
 
       <!-- 하단부 서명 -->
-      <div class="text-center relative z-10" style="padding-bottom: 2mm;">
+      <div class="text-center relative z-10" style="padding-bottom: 3mm;">
         <p class="footer-text" style="font-size: 12px; letter-spacing: 0.25em; font-weight: 400; user-select: none;">
           전민동성당
         </p>
@@ -586,7 +573,7 @@
 
   </main>
 
-  <!-- 복사 안내 팝업 (인쇄 시 완벽 차단) -->
+  <!-- 복사 안내 팝업 (인쇄 시 자동 숨김) -->
   <div id="toast" class="no-print" style="position: fixed; bottom: 24px; right: 24px; z-index: 100; background: #0f172a; color: #ffffff; padding: 10px 18px; border-radius: 12px; font-size: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); transition: all 0.25s ease; opacity: 0; transform: translateY(12px); pointer-events: none;">
     기도문이 복사되었습니다.
   </div>
@@ -619,26 +606,26 @@
       }
     }
 
-    // 테마 전환
+    // 테마 전환 (양피지 / 순백색)
     function applyTheme(themeClass) {
       const targets = [document.getElementById('viewDual'), document.getElementById('viewSingle')];
       targets.forEach(t => {
-        t.classList.remove('theme-cream', 'theme-white', 'theme-burgundy');
+        t.classList.remove('theme-cream', 'theme-white');
         t.classList.add(themeClass);
       });
 
       const btnCream = document.getElementById('themeBtn-cream');
       const btnWhite = document.getElementById('themeBtn-white');
       if (themeClass === 'theme-cream') {
-        btnCream.className = 'px-2 py-1 rounded bg-white text-slate-800 font-medium';
-        btnWhite.className = 'px-2 py-1 rounded text-slate-500 hover:text-slate-800';
+        btnCream.className = 'px-2.5 py-1 rounded bg-white text-slate-800 font-medium shadow-xs';
+        btnWhite.className = 'px-2.5 py-1 rounded text-slate-500 hover:text-slate-800';
       } else {
-        btnWhite.className = 'px-2 py-1 rounded bg-white text-slate-800 font-medium';
-        btnCream.className = 'px-2 py-1 rounded text-slate-500 hover:text-slate-800';
+        btnWhite.className = 'px-2.5 py-1 rounded bg-white text-slate-800 font-medium shadow-xs';
+        btnCream.className = 'px-2.5 py-1 rounded text-slate-500 hover:text-slate-800';
       }
     }
 
-    // 클립보드 복사 시에만 토스트 팝업 표시
+    // 클립보드 복사
     function copyToClipboard() {
       const text = `전민동성당 바자회 준비기도
 
@@ -690,7 +677,7 @@
       document.body.removeChild(ta);
     }
 
-    // 초기 화면 준비 (불필요한 토스트 알림 없이 즉시 렌더링)
+    // 초기 화면 진입
     window.addEventListener('DOMContentLoaded', () => {
       switchLayout('dual');
     });
