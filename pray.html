@@ -4,154 +4,173 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>전민동성당 바자회 준비기도</title>
+  
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  
   <!-- Google Fonts: Noto Serif KR -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Noto Serif KR', serif;
       -webkit-font-smoothing: antialiased;
+      margin: 0;
+      padding: 0;
     }
 
-    /* A4 실제 규격 시뮬레이션 (210mm x 296mm) */
-    .a4-sheet {
-      box-sizing: border-box;
+    /* 시트 공통 */
+    .sheet-paper {
       position: relative;
+      background: #ffffff;
+      box-sizing: border-box;
       overflow: hidden;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: all 0.25s ease-in-out;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
     }
 
-    /* 모드 1: A4 전면 1장 (세로) */
+    /* 모드 1: A4 1장 전면 (세로형) */
     .layout-single {
       width: 210mm;
+      min-width: 210mm;
       height: 296mm;
       max-height: 296mm;
     }
 
-    /* 모드 2: A4 1장에 A5 2장 (가로 2분할) */
-    .layout-dual-container {
+    /* 모드 2: A4 1장에 A5 2개 분할 (가로형) */
+    .layout-dual {
       width: 297mm;
+      min-width: 297mm;
       height: 209mm;
       max-height: 209mm;
       display: flex;
       flex-direction: row;
-      background: white;
     }
 
-    .a5-card {
+    .a5-half {
       width: 50%;
       height: 100%;
-      box-sizing: border-box;
       position: relative;
       overflow: hidden;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      box-sizing: border-box;
     }
 
-    /* 가운데 절취선 및 가위 기호 */
-    .cut-guide-line {
+    /* 중앙 절취선 및 안내 */
+    .cut-line {
       position: absolute;
       top: 0;
       bottom: 0;
       left: 50%;
       width: 0;
-      border-left: 1px dashed #94a3b8;
-      z-index: 30;
+      border-left: 1px dashed #a0aec0;
+      z-index: 25;
       pointer-events: none;
     }
-    .cut-guide-icon {
+    .cut-badge {
       position: absolute;
-      top: 10px;
+      top: 8px;
       left: 50%;
       transform: translateX(-50%);
-      background: white;
-      padding: 2px 4px;
-      font-size: 11px;
-      color: #94a3b8;
-      z-index: 31;
-      border-radius: 4px;
-      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      padding: 2px 6px;
+      font-size: 10px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #718096;
+      border: 1px solid #cbd5e0;
+      border-radius: 9999px;
+      z-index: 26;
       pointer-events: none;
+      white-space: nowrap;
     }
 
-    /* 테마별 색상 설정 */
+    /* 테마: 양피지 (Cream) */
     .theme-cream {
-      background-color: #faf7f2;
+      background-color: #faf7f2 !important;
       color: #2b2623;
     }
-    .theme-cream .sheet-border {
+    .theme-cream .sheet-outer-border {
       border-color: #c8b99d;
     }
     .theme-cream .sheet-inner-border {
       border-color: #dfd5c4;
     }
-    .theme-cream .accent-text {
+    .theme-cream .accent-symbol {
       color: #8c6d3b;
     }
-    .theme-cream .response-symbol {
+    .theme-cream .response-dot {
       color: #993b3b;
     }
-    .theme-cream .sub-text {
+    .theme-cream .footer-muted {
       color: #948777;
     }
 
+    /* 테마: 순백색 (Pure White) */
     .theme-white {
-      background-color: #ffffff;
-      color: #1f2937;
+      background-color: #ffffff !important;
+      color: #1a202c;
     }
-    .theme-white .sheet-border {
+    .theme-white .sheet-outer-border {
       border-color: #cbd5e1;
     }
     .theme-white .sheet-inner-border {
-      border-color: #f1f5f9;
+      border-color: #e2e8f0;
     }
-    .theme-white .accent-text {
+    .theme-white .accent-symbol {
       color: #475569;
     }
-    .theme-white .response-symbol {
+    .theme-white .response-dot {
       color: #b91c1c;
     }
-    .theme-white .sub-text {
-      color: #94a3b8;
+    .theme-white .footer-muted {
+      color: #a0aec0;
     }
 
+    /* 테마: 전례적색 (Burgundy) */
     .theme-burgundy {
-      background-color: #fdfbf7;
-      color: #2c2020;
+      background-color: #fdfbf8 !important;
+      color: #261c1c;
     }
-    .theme-burgundy .sheet-border {
+    .theme-burgundy .sheet-outer-border {
       border-color: #8b3a3a;
     }
     .theme-burgundy .sheet-inner-border {
-      border-color: #e5cfcf;
+      border-color: #e8d0d0;
     }
-    .theme-burgundy .accent-text {
+    .theme-burgundy .accent-symbol {
       color: #8b3a3a;
     }
-    .theme-burgundy .response-symbol {
+    .theme-burgundy .response-dot {
       color: #8b3a3a;
     }
-    .theme-burgundy .sub-text {
-      color: #b08d8d;
+    .theme-burgundy .footer-muted {
+      color: #aa8686;
     }
 
-    /* 인쇄 전용 설정 (동적 모드별 portrait / landscape 자동 분기) */
+    /* 인쇄 전용 CSS (1페이지 초과 방지) */
     @media print {
       body {
-        background: transparent !important;
+        background: #ffffff !important;
         padding: 0 !important;
         margin: 0 !important;
       }
       .no-print {
         display: none !important;
+      }
+      .sheet-wrapper {
+        padding: 0 !important;
+        margin: 0 !important;
+        display: block !important;
       }
       
       body.mode-single {
@@ -167,147 +186,138 @@
         }
       }
 
-      .a4-sheet, .layout-dual-container {
-        box-shadow: none !important;
-        border-radius: 0 !important;
-        page-break-after: avoid !important;
-        page-break-inside: avoid !important;
-      }
-
       .layout-single {
         width: 100vw !important;
         height: 100vh !important;
         max-height: 100vh !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        page-break-inside: avoid !important;
+        page-break-after: avoid !important;
       }
 
-      .layout-dual-container {
+      .layout-dual {
         width: 100vw !important;
         height: 100vh !important;
         max-height: 100vh !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        page-break-inside: avoid !important;
+        page-break-after: avoid !important;
       }
-    }
-
-    /* 편집 포커스 스타일 */
-    [contenteditable="true"]:focus {
-      outline: none;
-      background-color: rgba(217, 119, 6, 0.05);
-      border-radius: 4px;
     }
   </style>
 </head>
-<body class="bg-slate-100 min-h-screen flex flex-col text-slate-800 antialiased py-6 print:p-0 mode-dual">
+<body class="bg-slate-200 min-h-screen flex flex-col text-slate-800 antialiased mode-dual">
 
-  <!-- 상단 제어 바 (인쇄 시 자동 숨김) -->
-  <header class="no-print max-w-5xl w-full mx-auto mb-6 px-4">
-    <div class="bg-white/95 backdrop-blur shadow-md rounded-2xl p-4 border border-slate-200 flex flex-wrap items-center justify-between gap-4">
+  <!-- 상단 컨트롤 툴바 (인쇄 시 자동 숨김) -->
+  <header class="no-print bg-white border-b border-slate-300 shadow-sm sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
       
-      <!-- 안내 -->
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl bg-amber-700/10 text-amber-800 flex items-center justify-center font-bold text-lg">
+      <!-- 성당 명칭 안내 -->
+      <div class="flex items-center space-x-2.5">
+        <div class="w-8 h-8 rounded-lg bg-amber-700/10 text-amber-800 flex items-center justify-center font-bold text-base">
           ✝
         </div>
         <div>
-          <h1 class="text-base font-bold text-slate-800 leading-snug">전민동성당 바자회 준비기도</h1>
-          <p class="text-xs text-slate-500">A4 1장 전면 또는 A5 2개 분할 출력 지원 · 1페이지 맞춤</p>
+          <h1 class="text-sm font-bold text-slate-900 leading-tight">전민동성당 바자회 준비기도</h1>
+          <p class="text-[11px] text-slate-500">A4 전면 또는 A5 2분할(가로) 인쇄 지원</p>
         </div>
       </div>
 
-      <!-- 조작 도구 -->
-      <div class="flex flex-wrap items-center gap-3">
-
-        <!-- 인쇄 규격 선택 (A4 1장 vs A5 2개 분할) -->
-        <div class="flex items-center bg-amber-50/80 rounded-xl p-1 border border-amber-200/80 text-xs font-semibold">
-          <button onclick="setLayout('dual')" id="btn-layout-dual" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-amber-800 text-white shadow-sm transition-all">
-            <span>A5 × 2개 (A4 1장)</span>
-          </button>
-          <button onclick="setLayout('single')" id="btn-layout-single" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-amber-950 hover:text-amber-800 transition-all">
-            <span>A4 전면 (1개)</span>
-          </button>
-        </div>
+      <!-- 제어 도구 모음 -->
+      <div class="flex flex-wrap items-center gap-2">
         
+        <!-- 인쇄 규격 전환 토글 -->
+        <div class="flex items-center bg-amber-50 rounded-lg p-1 border border-amber-200 text-xs font-semibold">
+          <button id="btnDual" onclick="switchLayout('dual')" class="px-2.5 py-1.5 rounded-md bg-amber-800 text-white shadow-sm transition">
+            A5 × 2개 (A4 1장)
+          </button>
+          <button id="btnSingle" onclick="switchLayout('single')" class="px-2.5 py-1.5 rounded-md text-amber-900 hover:text-amber-700 transition">
+            A4 전면 (1개)
+          </button>
+        </div>
+
         <!-- 글자 크기 슬라이더 -->
-        <div class="flex items-center bg-slate-50 rounded-xl px-3 py-1.5 border border-slate-200 text-xs">
-          <label for="fontSizeRange" class="text-slate-600 font-medium mr-2 whitespace-nowrap">글자 크기</label>
-          <input id="fontSizeRange" type="range" min="10" max="20" value="12" step="0.5" 
-                 class="w-20 accent-amber-700 cursor-pointer" oninput="changeFontSize(this.value)">
-          <span id="fontSizeDisplay" class="ml-2 font-mono text-slate-500 w-10 text-right">12.0px</span>
+        <div class="flex items-center bg-slate-100 rounded-lg px-2.5 py-1.5 border border-slate-200 text-xs">
+          <label for="fontSlider" class="text-slate-600 font-medium mr-2 whitespace-nowrap">글자 크기</label>
+          <input id="fontSlider" type="range" min="10" max="18" value="12" step="0.5" 
+                 class="w-16 accent-amber-700 cursor-pointer" oninput="updateFontSize(this.value)">
+          <span id="fontDisplay" class="ml-1.5 font-mono text-slate-600 w-9 text-right text-[11px]">12.0px</span>
         </div>
 
-        <!-- 배경 테마 -->
-        <div class="flex items-center bg-slate-50 rounded-xl p-1 border border-slate-200 text-xs">
-          <button onclick="setTheme('theme-cream')" id="btn-cream" class="px-2.5 py-1 rounded-lg font-medium bg-white text-slate-800 shadow-sm transition-all">양피지</button>
-          <button onclick="setTheme('theme-white')" id="btn-white" class="px-2.5 py-1 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition-all">순백색</button>
-          <button onclick="setTheme('theme-burgundy')" id="btn-burgundy" class="px-2.5 py-1 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition-all">전례적색</button>
+        <!-- 테마 선택 -->
+        <div class="flex items-center bg-slate-100 rounded-lg p-1 border border-slate-200 text-xs">
+          <button id="themeBtn-cream" onclick="applyTheme('theme-cream')" class="px-2 py-1 rounded bg-white font-medium text-slate-800 shadow-xs">양피지</button>
+          <button id="themeBtn-white" onclick="applyTheme('theme-white')" class="px-2 py-1 rounded font-medium text-slate-600 hover:text-slate-900">순백색</button>
+          <button id="themeBtn-burgundy" onclick="applyTheme('theme-burgundy')" class="px-2 py-1 rounded font-medium text-slate-600 hover:text-slate-900">전례적색</button>
         </div>
 
-        <!-- 텍스트 복사 버튼 -->
-        <button onclick="copyPrayerText()" class="inline-flex items-center space-x-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition shadow-sm">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- 기도문 복사 -->
+        <button onclick="copyToClipboard()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold border border-slate-300 transition flex items-center space-x-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path>
           </svg>
           <span>글 복사</span>
         </button>
 
-        <!-- 인쇄 버튼 -->
-        <button onclick="triggerPrint()" class="inline-flex items-center space-x-2 px-4 py-2 bg-amber-800 hover:bg-amber-900 text-white rounded-xl text-xs font-bold transition shadow-sm hover:shadow active:scale-95">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- 인쇄 실행 버튼 -->
+        <button onclick="window.print()" class="px-4 py-1.5 bg-amber-800 hover:bg-amber-900 text-white rounded-lg text-xs font-bold shadow transition flex items-center space-x-1.5 active:scale-95">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
           </svg>
-          <span id="printBtnText">A4 가로 2구 인쇄</span>
+          <span id="printBtnText">인쇄하기</span>
         </button>
 
       </div>
     </div>
   </header>
 
-  <!-- 메인 A4 인쇄용 시트 컨테이너 -->
-  <main class="flex-grow flex items-center justify-center print:m-0 print:p-0 overflow-x-auto p-4">
+  <!-- 메인 시트 캔버스 영역 (화면에서는 스크롤 가능하며 비율 보장) -->
+  <main class="sheet-wrapper flex-grow flex items-center justify-center p-4 print:p-0 overflow-x-auto">
 
-    <!-- 1. [A5 2개 분할 모드] (기본값) -->
-    <div id="dualView" class="layout-dual-container theme-cream shadow-2xl rounded-sm relative transition-all duration-300">
+    <!-- 1. [A5 2개 분할 모드] (기본) -->
+    <div id="viewDual" class="sheet-paper layout-dual theme-cream shadow-xl rounded-sm">
       
-      <!-- 가운데 절취 가이드선 및 가위 아이콘 -->
-      <div class="cut-guide-line"></div>
-      <div class="cut-guide-icon flex items-center space-x-1 shadow-sm">
-        <span>✂</span>
-        <span class="text-[9px] font-sans">반으로 자르는 선</span>
-      </div>
+      <!-- 절취선 및 가위 기호 -->
+      <div class="cut-line"></div>
+      <div class="cut-badge">✂ 자르는 선</div>
 
       <!-- 좌측 A5 카드 -->
-      <div class="a5-card px-8 py-7 border-r border-transparent">
-        <div class="sheet-border absolute inset-3 border-2 rounded pointer-events-none transition-colors duration-300"></div>
-        <div class="sheet-inner-border absolute inset-4 border border-dashed rounded pointer-events-none transition-colors duration-300"></div>
+      <div class="a5-half px-9 py-8">
+        <div class="sheet-outer-border absolute inset-3 border-2 rounded pointer-events-none"></div>
+        <div class="sheet-inner-border absolute inset-4 border border-dashed rounded pointer-events-none"></div>
         
-        <div class="accent-text absolute top-5 left-5 text-[10px] select-none opacity-80">✠</div>
-        <div class="accent-text absolute top-5 right-5 text-[10px] select-none opacity-80">✠</div>
-        <div class="accent-text absolute bottom-5 left-5 text-[10px] select-none opacity-80">✠</div>
-        <div class="accent-text absolute bottom-5 right-5 text-[10px] select-none opacity-80">✠</div>
+        <div class="accent-symbol absolute top-5 left-5 text-[10px] select-none opacity-80">✠</div>
+        <div class="accent-symbol absolute top-5 right-5 text-[10px] select-none opacity-80">✠</div>
+        <div class="accent-symbol absolute bottom-5 left-5 text-[10px] select-none opacity-80">✠</div>
+        <div class="accent-symbol absolute bottom-5 right-5 text-[10px] select-none opacity-80">✠</div>
 
         <!-- 상단 헤더 -->
         <div class="relative z-10 pt-1 text-center">
           <div class="flex items-center justify-center space-x-1.5 mb-1">
-            <span class="accent-text text-[8px] opacity-60">✦</span>
-            <svg class="w-4 h-4 accent-text opacity-90" viewBox="0 0 24 24" fill="currentColor">
+            <span class="accent-symbol text-[8px] opacity-60">✦</span>
+            <svg class="w-4 h-4 accent-symbol opacity-90" viewBox="0 0 24 24" fill="currentColor">
               <path d="M11 2h2v6h5v2h-5v12h-2V10H6V8h5V2z"/>
             </svg>
-            <span class="accent-text text-[8px] opacity-60">✦</span>
+            <span class="accent-symbol text-[8px] opacity-60">✦</span>
           </div>
-          <p class="accent-text text-[9px] uppercase tracking-[0.24em] font-medium mb-0.5 opacity-85">
-            Jeonmin Catholic Church · Bazaar Prayer
+          <p class="accent-symbol text-[9px] uppercase tracking-[0.24em] font-semibold mb-1 opacity-80">
+            JEONMIN CATHOLIC CHURCH · BAZAAR PRAYER
           </p>
-          <h2 class="text-base font-bold tracking-tight text-slate-900">
+          <h2 class="text-[17px] font-bold tracking-tight text-slate-900">
             전민동성당 바자회 준비기도
           </h2>
           <div class="flex items-center justify-center mt-1.5 space-x-1.5">
             <div class="h-px w-8 bg-current opacity-25"></div>
-            <span class="text-[7px] accent-text opacity-60">✠</span>
+            <span class="text-[7px] accent-symbol opacity-60">✠</span>
             <div class="h-px w-8 bg-current opacity-25"></div>
           </div>
         </div>
 
         <!-- 기도문 본문 -->
         <div class="relative z-10 max-w-sm mx-auto w-full my-auto px-1">
-          <div class="prayer-content text-left tracking-normal font-normal text-slate-800 transition-all duration-200" style="font-size: 12px; line-height: 1.85;">
+          <div class="prayer-body text-left tracking-normal text-slate-800" style="font-size: 12px; line-height: 1.85;">
             
             <div class="mb-3">
               <p>자비로우신 주 하느님</p>
@@ -342,7 +352,7 @@
                 <span>성 토마스 사도여</span>
               </div>
               <div class="flex items-center space-x-1.5 font-medium">
-                <span class="response-symbol text-[10px] font-bold">●</span>
+                <span class="response-dot text-[10px] font-bold">●</span>
                 <span>저희를 위하여 빌어주소서</span>
               </div>
               <div class="flex items-center space-x-1.5 pt-0.5">
@@ -350,7 +360,7 @@
                 <span>한국의 모든 순교 성인들이여</span>
               </div>
               <div class="flex items-center space-x-1.5 font-medium">
-                <span class="response-symbol text-[10px] font-bold">●</span>
+                <span class="response-dot text-[10px] font-bold">●</span>
                 <span>저희를 위하여 빌어주소서</span>
               </div>
             </div>
@@ -362,47 +372,47 @@
           </div>
         </div>
 
-        <!-- 하단 본당 서명 -->
+        <!-- 하단 본당명 서명 -->
         <div class="relative z-10 text-center pb-1">
-          <p class="sub-text text-[10px] tracking-widest font-light select-none">전민동성당</p>
+          <p class="footer-muted text-[10px] tracking-widest font-light select-none">전민동성당</p>
         </div>
       </div>
 
-      <!-- 우측 A5 카드 (좌측과 동일한 카드) -->
-      <div id="rightA5Card" class="a5-card px-8 py-7">
-        <div class="sheet-border absolute inset-3 border-2 rounded pointer-events-none transition-colors duration-300"></div>
-        <div class="sheet-inner-border absolute inset-4 border border-dashed rounded pointer-events-none transition-colors duration-300"></div>
+      <!-- 우측 A5 카드 (동일한 내용) -->
+      <div class="a5-half px-9 py-8">
+        <div class="sheet-outer-border absolute inset-3 border-2 rounded pointer-events-none"></div>
+        <div class="sheet-inner-border absolute inset-4 border border-dashed rounded pointer-events-none"></div>
         
-        <div class="accent-text absolute top-5 left-5 text-[10px] select-none opacity-80">✠</div>
-        <div class="accent-text absolute top-5 right-5 text-[10px] select-none opacity-80">✠</div>
-        <div class="accent-text absolute bottom-5 left-5 text-[10px] select-none opacity-80">✠</div>
-        <div class="accent-text absolute bottom-5 right-5 text-[10px] select-none opacity-80">✠</div>
+        <div class="accent-symbol absolute top-5 left-5 text-[10px] select-none opacity-80">✠</div>
+        <div class="accent-symbol absolute top-5 right-5 text-[10px] select-none opacity-80">✠</div>
+        <div class="accent-symbol absolute bottom-5 left-5 text-[10px] select-none opacity-80">✠</div>
+        <div class="accent-symbol absolute bottom-5 right-5 text-[10px] select-none opacity-80">✠</div>
 
         <!-- 상단 헤더 -->
         <div class="relative z-10 pt-1 text-center">
           <div class="flex items-center justify-center space-x-1.5 mb-1">
-            <span class="accent-text text-[8px] opacity-60">✦</span>
-            <svg class="w-4 h-4 accent-text opacity-90" viewBox="0 0 24 24" fill="currentColor">
+            <span class="accent-symbol text-[8px] opacity-60">✦</span>
+            <svg class="w-4 h-4 accent-symbol opacity-90" viewBox="0 0 24 24" fill="currentColor">
               <path d="M11 2h2v6h5v2h-5v12h-2V10H6V8h5V2z"/>
             </svg>
-            <span class="accent-text text-[8px] opacity-60">✦</span>
+            <span class="accent-symbol text-[8px] opacity-60">✦</span>
           </div>
-          <p class="accent-text text-[9px] uppercase tracking-[0.24em] font-medium mb-0.5 opacity-85">
-            Jeonmin Catholic Church · Bazaar Prayer
+          <p class="accent-symbol text-[9px] uppercase tracking-[0.24em] font-semibold mb-1 opacity-80">
+            JEONMIN CATHOLIC CHURCH · BAZAAR PRAYER
           </p>
-          <h2 class="text-base font-bold tracking-tight text-slate-900">
+          <h2 class="text-[17px] font-bold tracking-tight text-slate-900">
             전민동성당 바자회 준비기도
           </h2>
           <div class="flex items-center justify-center mt-1.5 space-x-1.5">
             <div class="h-px w-8 bg-current opacity-25"></div>
-            <span class="text-[7px] accent-text opacity-60">✠</span>
+            <span class="text-[7px] accent-symbol opacity-60">✠</span>
             <div class="h-px w-8 bg-current opacity-25"></div>
           </div>
         </div>
 
         <!-- 기도문 본문 -->
         <div class="relative z-10 max-w-sm mx-auto w-full my-auto px-1">
-          <div class="prayer-content text-left tracking-normal font-normal text-slate-800 transition-all duration-200" style="font-size: 12px; line-height: 1.85;">
+          <div class="prayer-body text-left tracking-normal text-slate-800" style="font-size: 12px; line-height: 1.85;">
             
             <div class="mb-3">
               <p>자비로우신 주 하느님</p>
@@ -437,7 +447,7 @@
                 <span>성 토마스 사도여</span>
               </div>
               <div class="flex items-center space-x-1.5 font-medium">
-                <span class="response-symbol text-[10px] font-bold">●</span>
+                <span class="response-dot text-[10px] font-bold">●</span>
                 <span>저희를 위하여 빌어주소서</span>
               </div>
               <div class="flex items-center space-x-1.5 pt-0.5">
@@ -445,7 +455,7 @@
                 <span>한국의 모든 순교 성인들이여</span>
               </div>
               <div class="flex items-center space-x-1.5 font-medium">
-                <span class="response-symbol text-[10px] font-bold">●</span>
+                <span class="response-dot text-[10px] font-bold">●</span>
                 <span>저희를 위하여 빌어주소서</span>
               </div>
             </div>
@@ -457,38 +467,38 @@
           </div>
         </div>
 
-        <!-- 하단 본당 서명 -->
+        <!-- 하단 본당명 서명 -->
         <div class="relative z-10 text-center pb-1">
-          <p class="sub-text text-[10px] tracking-widest font-light select-none">전민동성당</p>
+          <p class="footer-muted text-[10px] tracking-widest font-light select-none">전민동성당</p>
         </div>
       </div>
 
     </div>
 
     <!-- 2. [A4 전면 1장 모드] -->
-    <div id="singleView" class="a4-sheet layout-single theme-cream px-14 py-12 print:px-12 print:py-10 shadow-2xl rounded-sm transition-all duration-300 hidden">
+    <div id="viewSingle" class="sheet-paper layout-single theme-cream px-14 py-12 shadow-xl rounded-sm hidden">
       
-      <!-- 외곽 테두리 및 귀퉁이 장식 -->
-      <div class="sheet-border absolute inset-4 border-2 rounded pointer-events-none transition-colors duration-300"></div>
-      <div class="sheet-inner-border absolute inset-6 border border-dashed rounded pointer-events-none transition-colors duration-300"></div>
+      <!-- 테두리 -->
+      <div class="sheet-outer-border absolute inset-4 border-2 rounded pointer-events-none"></div>
+      <div class="sheet-inner-border absolute inset-6 border border-dashed rounded pointer-events-none"></div>
       
-      <div class="accent-text absolute top-7 left-7 text-xs select-none opacity-80">✠</div>
-      <div class="accent-text absolute top-7 right-7 text-xs select-none opacity-80">✠</div>
-      <div class="accent-text absolute bottom-7 left-7 text-xs select-none opacity-80">✠</div>
-      <div class="accent-text absolute bottom-7 right-7 text-xs select-none opacity-80">✠</div>
+      <div class="accent-symbol absolute top-7 left-7 text-xs select-none opacity-80">✠</div>
+      <div class="accent-symbol absolute top-7 right-7 text-xs select-none opacity-80">✠</div>
+      <div class="accent-symbol absolute bottom-7 left-7 text-xs select-none opacity-80">✠</div>
+      <div class="accent-symbol absolute bottom-7 right-7 text-xs select-none opacity-80">✠</div>
 
       <!-- 상단 헤더 -->
       <div class="relative z-10 pt-4 text-center">
         <div class="flex items-center justify-center space-x-2 mb-2">
-          <span class="accent-text text-[10px] tracking-widest opacity-60">✦</span>
-          <svg class="w-6 h-6 accent-text transition-colors duration-300 opacity-90" viewBox="0 0 24 24" fill="currentColor">
+          <span class="accent-symbol text-[10px] tracking-widest opacity-60">✦</span>
+          <svg class="w-6 h-6 accent-symbol opacity-90" viewBox="0 0 24 24" fill="currentColor">
             <path d="M11 2h2v6h5v2h-5v12h-2V10H6V8h5V2z"/>
           </svg>
-          <span class="accent-text text-[10px] tracking-widest opacity-60">✦</span>
+          <span class="accent-symbol text-[10px] tracking-widest opacity-60">✦</span>
         </div>
         
-        <p class="accent-text text-[11px] uppercase tracking-[0.28em] font-medium mb-1.5 opacity-85">
-          Jeonmin Catholic Church · Bazaar Prayer
+        <p class="accent-symbol text-[11px] uppercase tracking-[0.28em] font-semibold mb-1.5 opacity-85">
+          JEONMIN CATHOLIC CHURCH · BAZAAR PRAYER
         </p>
 
         <h2 class="text-2xl font-bold tracking-tight text-slate-900">
@@ -497,23 +507,23 @@
 
         <div class="flex items-center justify-center mt-3.5 space-x-2">
           <div class="h-px w-12 bg-current opacity-25"></div>
-          <span class="text-[9px] accent-text opacity-60">✠</span>
+          <span class="text-[9px] accent-symbol opacity-60">✠</span>
           <div class="h-px w-12 bg-current opacity-25"></div>
         </div>
       </div>
 
-      <!-- 기도문 본문 영역 -->
+      <!-- 본문 영역 -->
       <div class="relative z-10 max-w-xl mx-auto w-full my-auto px-6">
-        <div class="prayer-content text-left tracking-normal font-normal text-slate-800 transition-all duration-200" style="font-size: 16px; line-height: 2.1;">
+        <div class="prayer-body text-left tracking-normal text-slate-800" style="font-size: 16px; line-height: 2.05;">
           
-          <div class="mb-6 space-y-1">
+          <div class="mb-5 space-y-0.5">
             <p>자비로우신 주 하느님</p>
             <p>저희가 한마음으로 정성을 모아</p>
             <p>베풀어주신 은혜에 감사하는</p>
             <p>나눔의 잔치를 준비하게 하셨으니 찬미받으소서</p>
           </div>
 
-          <div class="mb-6 space-y-1">
+          <div class="mb-5 space-y-0.5">
             <p>주님 간절히 청하오니</p>
             <p>이 친교를 통하여 저희가 서로의 부족함을 너그럽게 품어 안으며</p>
             <p>그리스도 안에서 참된 일치를 이루게 하시고</p>
@@ -521,25 +531,25 @@
             <p class="font-medium">찾아오는 발길마다 평화를 가득 내려주소서</p>
           </div>
 
-          <div class="mb-6 space-y-1">
+          <div class="mb-5 space-y-0.5">
             <p>그리하여 저희 안에 하나 된 형제애의 온기가</p>
             <p>성당 문을 넘어 지역 사회와 온 이웃에게 고루 번져 나가게 하시며</p>
             <p>이곳을 찾는 모든 이가 따뜻한 환대 속에서</p>
             <p>저희의 작은 정성을 통해 살아계신 주님의 복음을 맛보게 하소서</p>
           </div>
 
-          <div class="mb-7">
+          <div class="mb-6">
             <p>우리 주 예수 그리스도를 통하여 비나이다</p>
             <p class="font-bold text-stone-900 mt-1">아멘</p>
           </div>
 
-          <div class="space-y-1.5 text-[14.5px] tracking-wide mb-5">
+          <div class="space-y-1 text-[14px] tracking-wide mb-5">
             <div class="flex items-center space-x-2">
               <span class="text-xs font-semibold opacity-75">○</span>
               <span>성 토마스 사도여</span>
             </div>
             <div class="flex items-center space-x-2 font-medium">
-              <span class="response-symbol text-xs font-bold transition-colors">●</span>
+              <span class="response-dot text-xs font-bold">●</span>
               <span>저희를 위하여 빌어주소서</span>
             </div>
             <div class="flex items-center space-x-2 pt-1">
@@ -547,13 +557,13 @@
               <span>한국의 모든 순교 성인들이여</span>
             </div>
             <div class="flex items-center space-x-2 font-medium">
-              <span class="response-symbol text-xs font-bold transition-colors">●</span>
+              <span class="response-dot text-xs font-bold">●</span>
               <span>저희를 위하여 빌어주소서</span>
             </div>
           </div>
 
           <div>
-            <p class="font-medium text-slate-800">
+            <p class="font-medium text-[14.5px] text-slate-800">
               성부와 성자와 성령의 이름으로 아멘
             </p>
           </div>
@@ -562,8 +572,8 @@
       </div>
 
       <!-- 하단부 서명 -->
-      <div class="relative z-10 text-center pb-2">
-        <p class="sub-text text-xs tracking-widest font-light select-none">
+      <div class="relative z-10 text-center pb-3">
+        <p class="footer-muted text-xs tracking-widest font-light select-none">
           전민동성당
         </p>
       </div>
@@ -573,126 +583,106 @@
   </main>
 
   <!-- 토스트 알림창 -->
-  <div id="toastBox" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl text-sm font-medium transition-all duration-300 opacity-0 translate-y-4 pointer-events-none flex items-center space-x-2">
-    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-    </svg>
-    <span id="toastMsg">알림 메시지</span>
+  <div id="toast" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-2 rounded-xl text-xs shadow-lg transition-all duration-300 opacity-0 translate-y-3 pointer-events-none">
+    알림 메시지
   </div>
 
   <script>
-    let currentLayout = 'dual'; // 'dual' | 'single'
-    let currentTheme = 'theme-cream';
+    let currentMode = 'dual'; // 'dual' | 'single'
 
-    // 인쇄 규격 레이아웃 변경 (dual: A5 x 2 / single: A4 x 1)
-    function setLayout(mode) {
-      currentLayout = mode;
-      const dualView = document.getElementById('dualView');
-      const singleView = document.getElementById('singleView');
-      const btnDual = document.getElementById('btn-layout-dual');
-      const btnSingle = document.getElementById('btn-layout-single');
-      const fontSlider = document.getElementById('fontSizeRange');
-      const fontDisplay = document.getElementById('fontSizeDisplay');
+    // 레이아웃 전환 함수 (A5 2개 분할 vs A4 전면 1개)
+    function switchLayout(mode) {
+      currentMode = mode;
+      const viewDual = document.getElementById('viewDual');
+      const viewSingle = document.getElementById('viewSingle');
+      const btnDual = document.getElementById('btnDual');
+      const btnSingle = document.getElementById('btnSingle');
+      const fontSlider = document.getElementById('fontSlider');
       const printBtnText = document.getElementById('printBtnText');
 
       if (mode === 'dual') {
         document.body.classList.remove('mode-single');
         document.body.classList.add('mode-dual');
-        dualView.classList.remove('hidden');
-        singleView.classList.add('hidden');
+        viewDual.classList.remove('hidden');
+        viewSingle.classList.add('hidden');
 
-        btnDual.className = 'flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-amber-800 text-white shadow-sm transition-all';
-        btnSingle.className = 'flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-amber-950 hover:text-amber-800 transition-all';
+        btnDual.className = 'px-2.5 py-1.5 rounded-md bg-amber-800 text-white shadow-sm transition';
+        btnSingle.className = 'px-2.5 py-1.5 rounded-md text-amber-900 hover:text-amber-700 transition';
 
-        // A5 추천 글자 크기
         fontSlider.min = '9';
         fontSlider.max = '15';
         fontSlider.value = '12';
-        fontDisplay.textContent = '12.0px';
         printBtnText.textContent = 'A4 가로 2구 인쇄';
-        changeFontSize(12);
-        showToast('A4 1장에 A5 2개 분할 배치로 전환되었습니다.');
+        updateFontSize(12);
+        showToastMsg('A4 1장에 A5 2장 배치 모드로 전환되었습니다.');
       } else {
         document.body.classList.remove('mode-dual');
         document.body.classList.add('mode-single');
-        dualView.classList.add('hidden');
-        singleView.classList.remove('hidden');
+        viewDual.classList.add('hidden');
+        viewSingle.classList.remove('hidden');
 
-        btnSingle.className = 'flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-amber-800 text-white shadow-sm transition-all';
-        btnDual.className = 'flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-amber-950 hover:text-amber-800 transition-all';
+        btnSingle.className = 'px-2.5 py-1.5 rounded-md bg-amber-800 text-white shadow-sm transition';
+        btnDual.className = 'px-2.5 py-1.5 rounded-md text-amber-900 hover:text-amber-700 transition';
 
-        // A4 추천 글자 크기
         fontSlider.min = '13';
         fontSlider.max = '20';
         fontSlider.value = '16';
-        fontDisplay.textContent = '16.0px';
         printBtnText.textContent = 'A4 세로 전면 인쇄';
-        changeFontSize(16);
-        showToast('A4 전면 1장 모드로 전환되었습니다.');
+        updateFontSize(16);
+        showToastMsg('A4 전면 1장 모드로 전환되었습니다.');
       }
     }
 
-    // 글자 크기 실시간 조절
-    function changeFontSize(val) {
-      const contents = document.querySelectorAll('.prayer-content');
-      const display = document.getElementById('fontSizeDisplay');
-      contents.forEach(content => {
-        content.style.fontSize = val + 'px';
-        if (currentLayout === 'dual') {
-          const lineHeight = Math.max(1.5, 1.95 - (val - 12) * 0.04);
-          content.style.lineHeight = lineHeight.toFixed(2);
+    // 글꼴 크기 변경 핸들러
+    function updateFontSize(val) {
+      const bodies = document.querySelectorAll('.prayer-body');
+      const fontDisplay = document.getElementById('fontDisplay');
+      bodies.forEach(b => {
+        b.style.fontSize = val + 'px';
+        if (currentMode === 'dual') {
+          b.style.lineHeight = Math.max(1.5, 1.95 - (val - 12) * 0.05).toFixed(2);
         } else {
-          const lineHeight = Math.max(1.7, 2.2 - (val - 16) * 0.05);
-          content.style.lineHeight = lineHeight.toFixed(2);
+          b.style.lineHeight = Math.max(1.7, 2.15 - (val - 16) * 0.05).toFixed(2);
         }
       });
-      display.textContent = parseFloat(val).toFixed(1) + 'px';
+      fontDisplay.textContent = parseFloat(val).toFixed(1) + 'px';
     }
 
-    // 배경 테마 전환
-    function setTheme(themeName) {
-      currentTheme = themeName;
-      const targets = [document.getElementById('dualView'), document.getElementById('singleView')];
-      targets.forEach(el => {
-        if (el) {
-          el.classList.remove('theme-cream', 'theme-white', 'theme-burgundy');
-          el.classList.add(themeName);
-        }
+    // 테마 전환 핸들러
+    function applyTheme(themeClass) {
+      const targets = [document.getElementById('viewDual'), document.getElementById('viewSingle')];
+      targets.forEach(t => {
+        t.classList.remove('theme-cream', 'theme-white', 'theme-burgundy');
+        t.classList.add(themeClass);
       });
 
       const themes = ['cream', 'white', 'burgundy'];
       themes.forEach(t => {
-        const btn = document.getElementById(`btn-${t}`);
-        if (`theme-${t}` === themeName) {
-          btn.className = 'px-2.5 py-1 rounded-lg font-medium bg-white text-slate-900 shadow-sm transition-all';
+        const btn = document.getElementById('themeBtn-' + t);
+        if ('theme-' + t === themeClass) {
+          btn.className = 'px-2 py-1 rounded bg-white font-medium text-slate-900 shadow-xs';
         } else {
-          btn.className = 'px-2.5 py-1 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition-all';
+          btn.className = 'px-2 py-1 rounded font-medium text-slate-600 hover:text-slate-900';
         }
       });
     }
 
-    // 인쇄 트리거
-    function triggerPrint() {
-      window.print();
-    }
-
-    // 커스텀 토스트 알림
-    function showToast(msg) {
-      const toast = document.getElementById('toastBox');
-      const text = document.getElementById('toastMsg');
-      text.textContent = msg;
-      toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+    // 토스트 안내창
+    function showToastMsg(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.remove('opacity-0', 'translate-y-3', 'pointer-events-none');
       toast.classList.add('opacity-100', 'translate-y-0');
 
       setTimeout(() => {
         toast.classList.remove('opacity-100', 'translate-y-0');
-        toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
-      }, 2500);
+        toast.classList.add('opacity-0', 'translate-y-3', 'pointer-events-none');
+      }, 2300);
     }
 
-    // 클립보드 복사
-    function copyPrayerText() {
-      const prayerText = `전민동성당 바자회 준비기도
+    // 텍스트 클립보드 복사
+    function copyToClipboard() {
+      const text = `전민동성당 바자회 준비기도
 
 자비로우신 주 하느님
 저희가 한마음으로 정성을 모아
@@ -722,29 +712,23 @@
 
 전민동성당`;
 
-      const textarea = document.createElement('textarea');
-      textarea.value = prayerText;
-      textarea.style.position = 'fixed';
-      textarea.style.opacity = '0';
-      document.body.appendChild(textarea);
-      textarea.select();
-      
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
       try {
-        const successful = document.execCommand('copy');
-        if (successful) {
-          showToast('기도문 전문이 클립보드에 복사되었습니다.');
-        } else {
-          showToast('복사에 실패했습니다. 직접 복사해주세요.');
-        }
-      } catch (err) {
-        showToast('복사 중 오류가 발생했습니다.');
+        document.execCommand('copy');
+        showToastMsg('기도문 전문이 클립보드에 복사되었습니다.');
+      } catch(e) {
+        showToastMsg('복사에 실패했습니다.');
       }
-      document.body.removeChild(textarea);
+      document.body.removeChild(ta);
     }
 
-    // 페이지 진입 시 기본 모드 실행
     window.addEventListener('DOMContentLoaded', () => {
-      setLayout('dual');
+      switchLayout('dual');
     });
   </script>
 </body>
