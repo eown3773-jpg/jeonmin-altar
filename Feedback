@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>청소년 사목 결산 & 사목 식별 피드백 시스템</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts (Noto Sans KR) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- Top Navigation Header -->
+  <header class="bg-indigo-900 text-white shadow-md sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <span class="text-2xl">✝️</span>
+        <div>
+          <h1 class="font-bold text-base md:text-lg leading-tight">청소년 사목 결산 & 식별 피드백</h1>
+          <p class="text-xs text-indigo-200">주님 안에서 함께 성장하는 본당 공동체</p>
+        </div>
+      </div>
+      
+      <!-- Role / View Mode Switcher -->
+      <div class="flex items-center bg-indigo-950/60 p-1 rounded-xl border border-indigo-700/50">
+        <button id="navUserBtn" onclick="switchView('user')" class="px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-all duration-200 bg-indigo-600 text-white shadow-sm flex items-center gap-1.5">
+          <i data-lucide="edit-3" class="w-4 h-4"></i> 피드백 작성
+        </button>
+        <button id="navAdminBtn" onclick="handleAdminAccessClick()" class="px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-all duration-200 text-indigo-200 hover:text-white flex items-center gap-1.5">
+          <i data-lucide="shield-check" class="w-4 h-4"></i> 보좌신부 식별함
+          <span id="badgeCount" class="ml-1 bg-amber-500 text-slate-900 text-xs px-1.5 py-0.2 rounded-full font-bold hidden">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 lg:p-8">
+
+    <!-- ============================================== -->
+    <!-- VIEW 1: 응답자 (교사회/자모회/청년회) 피드백 폼 -->
+    <!-- ============================================== -->
+    <div id="userView" class="max-w-2xl mx-auto space-y-6">
+      
+      <!-- 제출 완료 시 나타나는 감사 화면 (결과 비공개 보호) -->
+      <div id="submitSuccessCard" class="hidden bg-white rounded-2xl shadow-sm border border-emerald-200 p-8 text-center space-y-4 animate-in fade-in zoom-in-95">
+        <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
+          <i data-lucide="check" class="w-8 h-8"></i>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold text-slate-900">소중한 피드백이 전해졌습니다</h3>
+          <p class="text-xs md:text-sm text-slate-600 mt-2 leading-relaxed">
+            나눠주신 진솔한 말씀은 <strong>보좌신부의 기도와 식별함으로 안전하게 보관</strong>됩니다.<br>
+            다른 이들에게 원문이 공개되지 않으며, 사목적 배려를 담아 공동체에 선익이 되는 방향으로 전달하겠습니다.
+          </p>
+        </div>
+        <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row justify-center gap-2">
+          <button type="button" onclick="resetFormForNewSubmission()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs md:text-sm font-medium transition flex items-center justify-center gap-1.5 shadow-sm">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i> 다른 행사 피드백 추가 작성
+          </button>
+        </div>
+      </div>
+
+      <!-- 본 피드백 폼 컨테이너 -->
+      <div id="formSection" class="space-y-6">
+        <!-- 안내 공지 카드 (신부님의 완충 및 식별 철학 전달) -->
+        <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/80 rounded-2xl p-5 shadow-sm text-slate-700 space-y-2.5">
+          <div class="flex items-start gap-3">
+            <div class="p-2 bg-amber-500 text-white rounded-xl shadow-sm mt-0.5">
+              <i data-lucide="heart-handshake" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                솔직하고 진솔한 나눔을 부탁드립니다
+              </h2>
+              <p class="text-xs md:text-sm text-slate-600 mt-1 leading-relaxed">
+                본 조사는 1년 사목을 돌아보고 더 나은 방향을 모색하기 위한 설문입니다. 
+                <strong>결과와 작성 내용은 일반에 공개되지 않으며, 보좌신부 1인만이 열람하고 기도와 식별 과정</strong>을 거쳐 
+                상처가 아닌 건설적인 배움과 사랑의 양식이 되도록 정제하여 단체에 전해집니다. 안심하시고 편안하게 적어주세요.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 설문 양식 카드 -->
+        <form id="feedbackForm" onsubmit="handleSubmit(event)" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-6">
+          
+          <!-- 1. 단체 선택 -->
+          <div>
+            <label class="block text-sm font-bold text-slate-900 mb-2">
+              1. 소속 단체를 선택해주세요 <span class="text-rose-500">*</span>
+            </label>
+            <div id="groupOptionsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <!-- JS 동적 생성 -->
+            </div>
+          </div>
+
+          <!-- 2. 나눔 대상 (자유 입력 & 간편 칩 선택) -->
+          <div class="border-t border-slate-200 pt-5 space-y-2">
+            <div class="flex items-center justify-between">
+              <label class="block text-sm font-bold text-slate-900">
+                2. 어떤 행사나 활동에 대해 나누고 싶으신가요?
+              </label>
+              <span class="text-[11px] text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md font-medium">자유 입력</span>
+            </div>
+            <p class="text-xs text-slate-500">
+              정확한 행사 이름이 아니어도 괜찮습니다. 생각나는 활동이나 평소 아쉬웠던 점을 적어주세요.
+            </p>
+
+            <!-- 빠른 선택 태그 (터치 한 번으로 입력) -->
+            <div class="flex flex-wrap gap-1.5 pt-1">
+              <button type="button" onclick="setQuickTopic('첫영성체 교리 및 소통')" class="text-xs bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 px-2.5 py-1 rounded-full border border-slate-200 transition">
+                🕊️ 첫영성체 교리/소통
+              </button>
+              <button type="button" onclick="setQuickTopic('주일미사 및 전례')" class="text-xs bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 px-2.5 py-1 rounded-full border border-slate-200 transition">
+                ⛪ 주일미사/전례
+              </button>
+              <button type="button" onclick="setQuickTopic('여름 신앙학교/캠프')" class="text-xs bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 px-2.5 py-1 rounded-full border border-slate-200 transition">
+                🏕️ 여름캠프
+              </button>
+              <button type="button" onclick="setQuickTopic('성탄/부활 축제')" class="text-xs bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 px-2.5 py-1 rounded-full border border-slate-200 transition">
+                🎄 성탄/부활 행사
+              </button>
+              <button type="button" onclick="setQuickTopic('평소 단체 운영 및 소통')" class="text-xs bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 px-2.5 py-1 rounded-full border border-slate-200 transition">
+                💬 평소 소통/모임
+              </button>
+            </div>
+
+            <input type="text" id="eventSelect" required placeholder="예: 첫영성체 부모 모임, 여름캠프 식사 준비, 평소 공지 등" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+          </div>
+
+          <!-- 3. KPT 관점 피드백 입력 -->
+            </div>
+            <p class="text-xs text-indigo-600/90 mb-2">단체에 전혀 공유되지 않고, 신부님 사목 묵상에만 참조됩니다.</p>
+            <textarea id="privateText" rows="2" placeholder="단체 내 인간관계, 개인적 고충 등 신부님께만 털어놓고 싶은 말씀이 있다면 적어주세요." class="w-full bg-white border border-indigo-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition resize-y"></textarea>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl shadow-md transition duration-200 flex items-center justify-center gap-2">
+          <i data-lucide="send" class="w-4 h-4"></i> 피드백 제출하기 (보좌신부에게만 전달)
+        </button>
+      </form>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- VIEW 2: 보좌신부 전용 사목 식별 및 가공 대시보드 -->
+    <!-- ============================================== -->
+    <div id="adminView" class="hidden space-y-6">
+
+      <!-- 상단 컨트롤 바 & 통계 요약 -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-lg md:text-xl font-bold text-slate-900 flex items-center gap-2">
+              <span>🕊️</span> 사목 식별 & 피드백 정제소
+            </h2>
+            <span class="bg-indigo-100 text-indigo-800 text-[11px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
+              <i data-lucide="lock" class="w-3 h-3"></i> 신부님 전용 잠금 해제됨
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">
+            접수된 생생한 목소리를 묵상하여, 단체에 힘이 되는 사목 제안으로 다듬어 전달합니다.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <!-- 단체 필터 -->
+          <select id="adminGroupFilter" onchange="renderAdminList()" class="bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm px-3 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="ALL">전체 단체 보기</option>
+            <!-- 동적 옵션 -->
+          </select>
+
+          <!-- 상태 필터 -->
+          <select id="adminStatusFilter" onchange="renderAdminList()" class="bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm px-3 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="ALL">전체 상태</option>
+            <option value="PENDING">식별 대기중 (미가공)</option>
+            <option value="REVIEWED">식별 완료 (정제됨)</option>
+          </select>
+
+          <!-- 일괄 내보내기 버튼 -->
+          <button onclick="openExportModal()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs md:text-sm px-3.5 py-2 rounded-lg font-medium flex items-center gap-1.5 transition shadow-sm">
+            <i data-lucide="file-text" class="w-4 h-4"></i> 단체 전달용 보고서
+          </button>
+
+          <!-- 보안 로그아웃 버튼 -->
+          <button onclick="lockAdminSession()" title="식별함 잠금" class="border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs md:text-sm px-3 py-2 rounded-lg font-medium flex items-center gap-1 transition">
+            <i data-lucide="log-out" class="w-4 h-4"></i> 잠금/로그아웃
+          </button>
+        </div>
+      </div>
+
+      <!-- 리스트 & 카드 레이아웃 -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- 왼쪽: 피드백 리스트 -->
+        <div class="lg:col-span-5 space-y-3">
+          <div class="flex items-center justify-between px-1">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider" id="listSummaryText">
+              접수된 피드백 목록
+            </span>
+            <span class="text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full font-medium" id="totalCountBadge">
+              총 0건
+            </span>
+          </div>
+          <div id="feedbackList" class="space-y-3 max-h-[700px] overflow-y-auto custom-scrollbar pr-1">
+            <!-- JS 동적 렌더링 -->
+          </div>
+        </div>
+
+        <!-- 오른쪽: 신부님 식별 및 가공 에디터 -->
+        <div class="lg:col-span-7">
+          <div id="editorPanel" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sticky top-20 min-h-[500px]">
+            <div id="emptyEditorState" class="h-96 flex flex-col items-center justify-center text-center text-slate-400">
+              <i data-lucide="inbox" class="w-12 h-12 stroke-[1.5] mb-2 text-slate-300"></i>
+              <p class="font-medium text-slate-600 text-sm">목록에서 피드백을 선택해주세요</p>
+              <p class="text-xs text-slate-400 mt-1">원문을 읽고, 단체에 전달할 정제 문구를 작성할 수 있습니다.</p>
+            </div>
+
+            <!-- 활성화된 에디터 컨텐츠 -->
+            <div id="activeEditorContent" class="hidden space-y-5">
+              <!-- 헤더 정보 -->
+              <div class="border-b border-slate-200 pb-4">
+                <div class="flex items-center justify-between">
+                  <span id="detailGroupBadge" class="px-2.5 py-1 rounded-md text-xs font-semibold"></span>
+                  <span id="detailDate" class="text-xs text-slate-400"></span>
+                </div>
+                <h3 id="detailEventTitle" class="text-lg font-bold text-slate-900 mt-2"></h3>
+              </div>
+
+              <!-- 1. 원본 피드백 내용 (있는 그대로) -->
+              <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-3 text-sm">
+                <div class="font-semibold text-xs text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                  <i data-lucide="message-square" class="w-3.5 h-3.5"></i> 원본 피드백 (비공개 원문)
+                </div>
+                
+                <div id="rawKeepSection" class="space-y-0.5">
+                  <span class="text-xs font-semibold text-emerald-700">👍 좋았던 점 (Keep):</span>
+                  <p id="detailKeep" class="text-slate-700 whitespace-pre-line text-xs pl-2 bg-white/70 p-2 rounded-lg border border-emerald-100"></p>
+                </div>
+
+                <div class="space-y-0.5">
+                  <span class="text-xs font-semibold text-amber-700">⚠️ 아쉬운 점 (Problem):</span>
+                  <p id="detailProblem" class="text-slate-700 whitespace-pre-line text-xs pl-2 bg-white/70 p-2 rounded-lg border border-amber-100"></p>
+                </div>
+
+                <div id="rawTrySection" class="space-y-0.5">
+                  <span class="text-xs font-semibold text-indigo-700">💡 개선 제안 (Try):</span>
+                  <p id="detailTry" class="text-slate-700 whitespace-pre-line text-xs pl-2 bg-white/70 p-2 rounded-lg border border-indigo-100"></p>
+                </div>
+
+                <!-- 비밀 나눔 -->
+                <div id="detailPrivateContainer" class="hidden pt-2 border-t border-slate-200">
+                  <span class="text-xs font-semibold text-purple-700 flex items-center gap-1">
+                    <i data-lucide="lock" class="w-3 h-3"></i> 신부님께만 드린 비밀 나눔:
+                  </span>
+                  <p id="detailPrivate" class="text-slate-600 italic whitespace-pre-line text-xs pl-2 bg-purple-50/50 p-2 rounded-lg border border-purple-100 mt-1"></p>
+                </div>
+              </div>
+
+              <!-- 2. 신부님의 식별 & 전달용 정제 에디터 -->
+              <div class="bg-amber-50/40 rounded-xl p-4 border border-amber-200 space-y-3">
+                <div class="flex items-center justify-between">
+                  <div class="font-bold text-xs text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
+                    <i data-lucide="pen-tool" class="w-4 h-4 text-amber-600"></i> 단체 전달용 정제 메모 (보좌신부의 식별)
+                  </div>
+                  <span class="text-[11px] text-amber-700 font-medium">※ 이 내용만 단체로 공유됩니다</span>
+                </div>
+
+                <div class="space-y-1">
+                  <label class="block text-xs font-medium text-slate-700">상처 주지 않고 건설적인 '사목적 전달 메시지'로 변환</label>
+                  <textarea id="refinedFeedbackText" rows="4" placeholder="예: [안내/일정] 행사 당일 봉사자 배치 및 타임테이블을 사전 2주 전에 공유하여 각 단체가 여유 있게 준비할 수 있도록 시스템 보완 필요." class="w-full bg-white border border-amber-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none transition resize-y"></textarea>
+                </div>
+
+                <!-- 빠른 변환 제안 도우미 -->
+                <div class="flex flex-wrap gap-1.5 pt-1">
+                  <button type="button" onclick="insertRefinedTemplate('communication')" class="text-[11px] bg-white hover:bg-amber-100 text-amber-800 border border-amber-200 px-2 py-1 rounded">💬 수도자/사목자-자모회 소통 완충</button>
+                  <button type="button" onclick="insertRefinedTemplate('time')" class="text-[11px] bg-white hover:bg-amber-100 text-amber-800 border border-amber-200 px-2 py-1 rounded">⏱️ 일정/공지 사전공유 보완</button>
+                  <button type="button" onclick="insertRefinedTemplate('role')" class="text-[11px] bg-white hover:bg-amber-100 text-amber-800 border border-amber-200 px-2 py-1 rounded">🤝 자모회-교사회 업무분담 명확화</button>
+                  <button type="button" onclick="insertRefinedTemplate('budget')" class="text-[11px] bg-white hover:bg-amber-100 text-amber-800 border border-amber-200 px-2 py-1 rounded">💰 예산 및 물품 사전점검</button>
+                  <button type="button" onclick="insertRefinedTemplate('keep')" class="text-[11px] bg-white hover:bg-amber-100 text-amber-800 border border-amber-200 px-2 py-1 rounded">👏 우수 사례 칭찬 및 격려</button>
+                </div>
+
+                <div class="flex items-center justify-between pt-2">
+                  <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer">
+                    <input type="checkbox" id="markAsReviewedCheck" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                    <span class="font-medium">식별 및 정제 완료 상태로 표시</span>
+                  </label>
+
+                  <button type="button" onclick="saveDiscernment()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs md:text-sm px-4 py-2 rounded-lg font-medium flex items-center gap-1.5 transition shadow">
+                    <i data-lucide="check" class="w-4 h-4"></i> 식별 저장하기
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ============================================== -->
+  <!-- MODAL: 단체 전달용 정리 보고서 팝업 -->
+  <!-- ============================================== -->
+  <div id="exportModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
+      
+      <!-- 모달 헤더 -->
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+        <div>
+          <h3 class="text-base md:text-lg font-bold text-slate-900 flex items-center gap-2">
+            📋 단체 공유용 사목 피드백 보고서
+          </h3>
+          <p class="text-xs text-slate-500 mt-0.5">신부님께서 정제하신 내용만 깔끔하게 모아 카톡이나 문서로 전달할 수 있습니다.</p>
+        </div>
+        <button onclick="closeExportModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- 모달 컨트롤 -->
+      <div class="px-6 py-3 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-2">
+          <span class="font-semibold text-slate-700">추출 단체:</span>
+          <select id="exportGroupFilter" onchange="generateReportText()" class="bg-white border border-slate-300 rounded px-2.5 py-1 text-xs">
+            <option value="ALL">전체 단체 합본</option>
+            <!-- 동적 옵션 -->
+          </select>
+        </div>
+        <div class="text-slate-500">
+          <span id="exportCountText">정제 완료 0건 반영</span>
+        </div>
+      </div>
+
+      <!-- 본문 영역 -->
+      <div class="p-6 overflow-y-auto custom-scrollbar flex-1">
+        <textarea id="reportOutputArea" readonly class="w-full h-80 p-3 bg-slate-50 border border-slate-300 rounded-xl font-mono text-xs md:text-sm text-slate-800 focus:outline-none resize-none"></textarea>
+      </div>
+
+      <!-- 모달 푸터 -->
+      <div class="px-6 py-3.5 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
+        <span id="copyToast" class="text-xs text-emerald-600 font-semibold opacity-0 transition-opacity">
+          ✅ 클립보드에 복사되었습니다!
+        </span>
+        <div class="flex items-center gap-2">
+          <button onclick="closeExportModal()" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-xs md:text-sm font-medium hover:bg-slate-100">
+            닫기
+          </button>
+          <button onclick="copyReportToClipboard()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs md:text-sm font-medium flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="copy" class="w-4 h-4"></i> 텍스트 복사하기
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: 보좌신부 전용 보안 비밀번호(PIN) 인증창 -->
+  <!-- ============================================== -->
+  <div id="adminAuthModal" class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 space-y-4">
+      <div class="text-center space-y-1.5">
+        <div class="w-12 h-12 bg-indigo-100 text-indigo-700 rounded-2xl flex items-center justify-center mx-auto mb-2 shadow-inner">
+          <i data-lucide="key-round" class="w-6 h-6"></i>
+        </div>
+        <h3 class="text-lg font-bold text-slate-900">보좌신부 전용 인증</h3>
+        <p class="text-xs text-slate-500 leading-relaxed">
+          피드백 결과와 원문은 보좌신부님만 열람하실 수 있습니다. 비밀번호를 입력해주세요.
+        </p>
+      </div>
+
+      <form id="adminAuthForm" onsubmit="verifyAdminPassword(event)" class="space-y-4 pt-1">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">인증 비밀번호</label>
+          <input type="password" id="adminPasswordInput" placeholder="기본 비밀번호: 7777" autofocus required class="w-full text-center tracking-widest text-lg font-mono bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+          <p id="authErrorMsg" class="text-rose-500 text-xs mt-1.5 text-center hidden">비밀번호가 올바르지 않습니다.</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closeAdminAuthModal()" class="w-1/2 py-2.5 border border-slate-300 text-slate-700 text-xs md:text-sm font-medium rounded-xl hover:bg-slate-50 transition">
+            취소
+          </button>
+          <button type="submit" class="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs md:text-sm font-medium rounded-xl transition shadow-sm">
+            확인
+          </button>
+        </div>
+      </form>
+      <div class="text-[11px] text-center text-slate-400 border-t border-slate-100 pt-3">
+        초기 비밀번호는 <span class="font-mono text-indigo-600 font-bold">7777</span> 입니다.
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification System -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-16 opacity-0 transition-all duration-300 pointer-events-none bg-slate-900 text-white text-sm px-4 py-3 rounded-xl shadow-xl flex items-center gap-2">
+    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+    <span id="toastMsg">알림 메시지</span>
+  </div>
+
+  <!-- Application Logic -->
+  <script>
+    // 1. 단체 목록 정의 (신부님께서 제시하신 대상 단체)
+    const TARGET_GROUPS = [
+      { id: "elem_mom", name: "초등부 자모회", badge: "bg-blue-100 text-blue-800 border-blue-200" },
+      { id: "elem_teacher", name: "초등부 교사회", badge: "bg-sky-100 text-sky-800 border-sky-200" },
+      { id: "midhigh_mom", name: "중고등부 자모회", badge: "bg-emerald-100 text-emerald-800 border-emerald-200" },
+      { id: "midhigh_teacher", name: "중고등부 교사회", badge: "bg-teal-100 text-teal-800 border-teal-200" },
+      { id: "communion_teacher", name: "첫영성체 교사회", badge: "bg-purple-100 text-purple-800 border-purple-200" },
+      { id: "communion_mom", name: "첫영성체 자모회", badge: "bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200" },
+      { id: "youth", name: "청년회", badge: "bg-amber-100 text-amber-800 border-amber-200" }
+    ];
+
+    // 초기 샘플 데이터 (신부님 확인 및 시연용)
+    const INITIAL_FEEDBACKS = [
+      {
+        id: "fb-1",
+        groupId: "elem_mom",
+        groupName: "초등부 자모회",
+        event: "여름 신앙학교/캠프",
+        keep: "아이들이 성당 마당에서 물놀이하며 신부님, 교사들과 친해질 수 있어서 정말 좋았습니다. 간식 준비도 자모들끼리 협업이 잘 되었습니다.",
+        problem: "물놀이 후 탈의실 안내가 너무 혼란스러웠고, 자모회에 간식 수량 변경 공지가 당일 아침에 급하게 전달되어 음식이 부족할 뻔했습니다.",
+        tryText: "식단표와 알레르기 조사, 시간표는 적어도 2주 전에 확정되어 자모회에 공유되었으면 좋겠습니다.",
+        privateNote: "일부 자모님들이 교사회가 소통을 늦게 해준다고 서운해하셨습니다. 신부님께서 온화하게 다리 역할을 해주시면 감사하겠습니다.",
+        createdAt: "2026-11-02 14:20",
+        refinedText: "[신앙학교 운영] 물놀이 및 세부 동선(탈의실 등) 사전 안내를 강화하고, 자모회 간식 준비 수량 등 협조 요청 사항은 행사 최소 2주 전 사전 확정 공지하여 원활한 협업 유도.",
+        isReviewed: true
+      },
+      {
+        id: "fb-2",
+        groupId: "midhigh_teacher",
+        groupName: "중고등부 교사회",
+        event: "1년 사목 전반 및 주일미사/교리",
+        keep: "시험 기간 전례 쉼터 운영과 청소년 미사 때 신부님의 강론이 학생들 눈높이에 맞춰져 출석률이 올랐습니다.",
+        problem: "교사 숫자가 너무 적어 매주 교리 준비와 미사 반주, 성가 지도가 한두 사람에게 과중하게 쏠리고 있습니다. 지쳐서 내년에 그만두겠다는 교사가 있습니다.",
+        tryText: "청년회나 학부모님들 중 미사 반주 봉사자 1명이라도 지원 연계를 해주시면 교사들이 본래 교리 교육에 집중할 수 있을 것 같습니다.",
+        privateNote: "교사들 사기가 많이 떨어져 있습니다. 신부님과 교사들만의 따뜻한 피정이나 삼겹살 회식이 한번 꼭 필요합니다.",
+        createdAt: "2026-11-05 19:40",
+        refinedText: "",
+        isReviewed: false
+      },
+      {
+        id: "fb-3",
+        groupId: "communion_mom",
+        groupName: "첫영성체 자모회",
+        event: "첫영성체 교리 및 예식",
+        keep: "아이들이 첫영성체 전 매일 기도문 외우며 신앙심이 훌쩍 큰 것이 느껴졌습니다. 신부님의 안수와 축복도 감동적이었습니다.",
+        problem: "부모 대상 교육 일정이 평일 저녁에만 잡혀서 맞벌이 부모들은 참석하기가 너무 어려웠고 죄책감이 들었습니다.",
+        tryText: "학부모 교리는 주일 교리 시간 중이나 온라인 영상 수강을 병행할 수 있게 해주시면 좋겠습니다.",
+        privateNote: "",
+        createdAt: "2026-11-07 10:15",
+        refinedText: "",
+        isReviewed: false
+      }
+    ];
+
+    // 메모리 내 데이터 상태
+    let feedbacks = [...INITIAL_FEEDBACKS];
+    let selectedFeedbackId = null;
+    let selectedGroupRadio = null;
+
+    // 보좌신부 보안 인증 상태
+    let isAdminAuthenticated = false;
+    let adminSecurityPin = "7777"; // 기본 비밀번호 (신부님 전용)
+
+    // 초기화
+    window.addEventListener('DOMContentLoaded', () => {
+      initGroupSelection();
+      initFilterDropdowns();
+      renderAdminList();
+      updateBadges();
+      lucide.createIcons();
+    });
+
+    // 보좌신부 식별함 탭 클릭 시 보안 확인
+    function handleAdminAccessClick() {
+      if (isAdminAuthenticated) {
+        switchView('admin');
+      } else {
+        openAdminAuthModal();
+      }
+    }
+
+    // 비밀번호 모달 열기/닫기
+    function openAdminAuthModal() {
+      const modal = document.getElementById('adminAuthModal');
+      const input = document.getElementById('adminPasswordInput');
+      const errorMsg = document.getElementById('authErrorMsg');
+      input.value = '';
+      errorMsg.classList.add('hidden');
+      modal.classList.remove('hidden');
+      setTimeout(() => input.focus(), 100);
+      lucide.createIcons();
+    }
+
+    function closeAdminAuthModal() {
+      document.getElementById('adminAuthModal').classList.add('hidden');
+    }
+
+    // 비밀번호 검증
+    function verifyAdminPassword(e) {
+      e.preventDefault();
+      const entered = document.getElementById('adminPasswordInput').value.trim();
+      const errorMsg = document.getElementById('authErrorMsg');
+
+      if (entered === adminSecurityPin) {
+        isAdminAuthenticated = true;
+        closeAdminAuthModal();
+        switchView('admin');
+        showToast("보좌신부님, 환영합니다. 식별함이 열렸습니다.");
+      } else {
+        errorMsg.classList.remove('hidden');
+      }
+    }
+
+    // 신부님 세션 잠금(로그아웃)
+    function lockAdminSession() {
+      isAdminAuthenticated = false;
+      switchView('user');
+      showToast("보좌신부 식별함이 안전하게 잠겼습니다.");
+    }
+
+    // 뷰 전환 (작성자 폼 vs 보좌신부 식별함)
+    function switchView(view) {
+      const userView = document.getElementById('userView');
+      const adminView = document.getElementById('adminView');
+      const navUserBtn = document.getElementById('navUserBtn');
+      const navAdminBtn = document.getElementById('navAdminBtn');
+
+      if (view === 'user') {
+        userView.classList.remove('hidden');
+        adminView.classList.add('hidden');
+        navUserBtn.className = "px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-all bg-indigo-600 text-white shadow-sm flex items-center gap-1.5";
+        navAdminBtn.className = "px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-all text-indigo-200 hover:text-white flex items-center gap-1.5";
+      } else {
+        // 관리자 인증이 안 된 경우 튕겨내기
+        if (!isAdminAuthenticated) {
+          openAdminAuthModal();
+          return;
+        }
+        userView.classList.add('hidden');
+        adminView.classList.remove('hidden');
+        navAdminBtn.className = "px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-all bg-indigo-600 text-white shadow-sm flex items-center gap-1.5";
+        navUserBtn.className = "px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-all text-indigo-200 hover:text-white flex items-center gap-1.5";
+        renderAdminList();
+      }
+      lucide.createIcons();
+    }
+
+    // 작성 폼 단체 선택 라디오 렌더링
+    function initGroupSelection() {
+      const container = document.getElementById('groupOptionsContainer');
+      container.innerHTML = TARGET_GROUPS.map((g, idx) => `
+        <label class="relative flex items-center p-3 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-100 cursor-pointer transition has-[:checked]:border-indigo-600 has-[:checked]:bg-indigo-50/50">
+          <input type="radio" name="groupRadio" value="${g.id}" ${idx === 0 ? 'checked' : ''} onchange="selectedGroupRadio = '${g.id}'" class="h-4 w-4 text-indigo-600 border-slate-300 focus:ring-indigo-500">
+          <span class="ml-2.5 text-xs md:text-sm font-medium text-slate-800">${g.name}</span>
+        </label>
+      `).join('');
+      selectedGroupRadio = TARGET_GROUPS[0].id;
+    }
+
+    // 관리자 필터 드롭다운 채우기
+    function initFilterDropdowns() {
+      const adminGroupFilter = document.getElementById('adminGroupFilter');
+      const exportGroupFilter = document.getElementById('exportGroupFilter');
+      
+      const optionsHtml = TARGET_GROUPS.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+      adminGroupFilter.innerHTML = '<option value="ALL">전체 단체 보기</option>' + optionsHtml;
+      exportGroupFilter.innerHTML = '<option value="ALL">전체 단체 합본</option>' + optionsHtml;
+    }
+
+    // 폼 제출 핸들러 (작성 후 결과를 절대 보여주지 않고 감사 화면으로 전환)
+    function handleSubmit(e) {
+      e.preventDefault();
+
+      const groupObj = TARGET_GROUPS.find(g => g.id === selectedGroupRadio);
+      const eventVal = document.getElementById('eventSelect').value;
+      const keepVal = document.getElementById('keepText').value.trim();
+      const problemVal = document.getElementById('problemText').value.trim();
+      const tryVal = document.getElementById('tryText').value.trim();
+      const privateVal = document.getElementById('privateText').value.trim();
+
+      if (!problemVal) {
+        showToast("아쉬웠던 점 또는 개선할 점을 적어주세요.");
+        return;
+      }
+
+      const now = new Date();
+      const formattedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+      const newEntry = {
+        id: "fb-" + Date.now(),
+        groupId: groupObj.id,
+        groupName: groupObj.name,
+        event: eventVal,
+        keep: keepVal,
+        problem: problemVal,
+        tryText: tryVal,
+        privateNote: privateVal,
+        createdAt: formattedDate,
+        refinedText: "",
+        isReviewed: false
+      };
+
+      // 보좌신부 저장소에 추가
+      feedbacks.unshift(newEntry);
+      updateBadges();
+
+      // 응답자 화면을 '제출 완료 감사 카드'로 전환하여 타인의 글이나 목록에 접근 불가하도록 차단
+      document.getElementById('formSection').classList.add('hidden');
+      document.getElementById('submitSuccessCard').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      lucide.createIcons();
+    }
+
+    // 추가 작성을 원하는 경우 폼 다시 표시
+    function resetFormForNewSubmission() {
+      document.getElementById('feedbackForm').reset();
+      initGroupSelection();
+      document.getElementById('submitSuccessCard').classList.add('hidden');
+      document.getElementById('formSection').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    // 관리자 리스트 렌더링
+    function renderAdminList() {
+      const groupFilter = document.getElementById('adminGroupFilter').value;
+      const statusFilter = document.getElementById('adminStatusFilter').value;
+      const listContainer = document.getElementById('feedbackList');
+
+      let filtered = feedbacks.filter(item => {
+        if (groupFilter !== 'ALL' && item.groupId !== groupFilter) return false;
+        if (statusFilter === 'PENDING' && item.isReviewed) return false;
+        if (statusFilter === 'REVIEWED' && !item.isReviewed) return false;
+        return true;
+      });
+
+      document.getElementById('totalCountBadge').textContent = `총 ${filtered.length}건`;
+
+      if (filtered.length === 0) {
+        listContainer.innerHTML = `
+          <div class="text-center py-12 bg-white rounded-xl border border-slate-200 text-slate-400">
+            <i data-lucide="filter-x" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+            <p class="text-xs">조건에 해당하는 피드백이 없습니다.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      listContainer.innerHTML = filtered.map(item => {
+        const isSelected = item.id === selectedFeedbackId;
+        const groupObj = TARGET_GROUPS.find(g => g.id === item.groupId);
+        const badgeClass = groupObj ? groupObj.badge : "bg-slate-100 text-slate-700";
+
+        return `
+          <div onclick="selectFeedback('${item.id}')" class="p-4 rounded-xl border transition cursor-pointer ${isSelected ? 'bg-indigo-50/80 border-indigo-400 shadow-sm' : 'bg-white border-slate-200 hover:border-indigo-200 hover:shadow-sm'}">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[11px] font-semibold px-2 py-0.5 rounded border ${badgeClass}">
+                ${item.groupName}
+              </span>
+              <div class="flex items-center gap-1.5">
+                ${item.privateNote ? '<span title="비밀 메모 포함" class="text-purple-600"><i data-lucide="lock" class="w-3.5 h-3.5"></i></span>' : ''}
+                <span class="text-[11px] px-2 py-0.5 rounded-full font-medium ${item.isReviewed ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                  ${item.isReviewed ? '식별 완료' : '식별 대기'}
+                </span>
+              </div>
+            </div>
+
+            <h4 class="text-xs md:text-sm font-bold text-slate-900 truncate">
+              ${item.event}
+            </h4>
+            
+            <p class="text-xs text-slate-600 line-clamp-2 mt-1 leading-relaxed">
+              ${item.problem}
+            </p>
+
+            <div class="flex items-center justify-between mt-2.5 pt-2 border-t border-slate-100 text-[11px] text-slate-400">
+              <span>${item.createdAt}</span>
+              ${item.refinedText ? '<span class="text-amber-700 font-medium">✨ 정제문 작성됨</span>' : '<span class="text-slate-400">원문 상태</span>'}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    // 개별 피드백 선택
+    function selectFeedback(id) {
+      selectedFeedbackId = id;
+      renderAdminList();
+
+      const item = feedbacks.find(f => f.id === id);
+      if (!item) return;
+
+      const emptyState = document.getElementById('emptyEditorState');
+      const activeContent = document.getElementById('activeEditorContent');
+      emptyState.classList.add('hidden');
+      activeContent.classList.remove('hidden');
+
+      // 원문 필드 주입
+      const groupObj = TARGET_GROUPS.find(g => g.id === item.groupId);
+      const detailGroupBadge = document.getElementById('detailGroupBadge');
+      detailGroupBadge.textContent = item.groupName;
+      detailGroupBadge.className = `px-2.5 py-1 rounded-md text-xs font-semibold border ${groupObj ? groupObj.badge : ''}`;
+
+      document.getElementById('detailDate').textContent = item.createdAt;
+      document.getElementById('detailEventTitle').textContent = `[${item.event}] 관련 의견`;
+
+      // KPT 원문 바인딩
+      const rawKeepSection = document.getElementById('rawKeepSection');
+      if (item.keep) {
+        rawKeepSection.classList.remove('hidden');
+        document.getElementById('detailKeep').textContent = item.keep;
+      } else {
+        rawKeepSection.classList.add('hidden');
+      }
+
+      document.getElementById('detailProblem').textContent = item.problem;
+
+      const rawTrySection = document.getElementById('rawTrySection');
+      if (item.tryText) {
+        rawTrySection.classList.remove('hidden');
+        document.getElementById('detailTry').textContent = item.tryText;
+      } else {
+        rawTrySection.classList.add('hidden');
+      }
+
+      // 비밀 메모 여부
+      const privateContainer = document.getElementById('detailPrivateContainer');
+      if (item.privateNote) {
+        privateContainer.classList.remove('hidden');
+        document.getElementById('detailPrivate').textContent = item.privateNote;
+      } else {
+        privateContainer.classList.add('hidden');
+      }
+
+      // 신부님 정제 필드 바인딩
+      document.getElementById('refinedFeedbackText').value = item.refinedText || '';
+      document.getElementById('markAsReviewedCheck').checked = item.isReviewed;
+
+      lucide.createIcons();
+    }
+
+    // 신부님 식별 내용 저장
+    function saveDiscernment() {
+      if (!selectedFeedbackId) return;
+
+      const item = feedbacks.find(f => f.id === selectedFeedbackId);
+      if (!item) return;
+
+      const refined = document.getElementById('refinedFeedbackText').value.trim();
+      const isReviewed = document.getElementById('markAsReviewedCheck').checked;
+
+      item.refinedText = refined;
+      item.isReviewed = isReviewed;
+
+      updateBadges();
+      renderAdminList();
+      showToast("사목 식별 및 정제 내용이 저장되었습니다.");
+    }
+
+    // 템플릿 문구 자동 삽입 도우미
+    function insertRefinedTemplate(type) {
+      const textarea = document.getElementById('refinedFeedbackText');
+      let textToAppend = "";
+      switch (type) {
+        case 'communication':
+          textToAppend = "[사목적 소통 체계 보완] 교리 및 본당 행사 관련 안내 시, 학부모 및 봉사자들의 의견 수렴과 사전 공지 일정을 충분히 확보하여 상호 오해 없는 온화한 소통 문화 조성 필요.";
+          break;
+        case 'time':
+          textToAppend = "[일정 및 공지 사전화] 각 행사 세부 시간표와 봉사자 역할 안내를 최소 2주 전 사전 확정하여 공유하는 체계 마련 필요.";
+          break;
+        case 'role':
+          textToAppend = "[역할 분담] 교사회와 자모회의 지원 영역을 문서화하여 행사 당일 혼선과 특정 단체의 과중한 부담 방지.";
+          break;
+        case 'budget':
+          textToAppend = "[예산 및 물품] 행사 1개월 전 물품 체크리스트 및 소요 예산을 미리 책정하여 당일 부족 사태 예방.";
+          break;
+        case 'keep':
+          textToAppend = "[우수 사례 지속] 봉사자들의 자발적 헌신과 유기적인 소통으로 참여 청소년들의 만족도가 매우 높았음. 다음 사목에도 본 방식 적극 유지 권장.";
+          break;
+      }
+      if (textarea.value) {
+        textarea.value += "\n" + textToAppend;
+      } else {
+        textarea.value = textToAppend;
+      }
+    }
+
+    // 빠른 토픽 칩 클릭 시 입력창에 즉시 입력
+    function setQuickTopic(topic) {
+      const input = document.getElementById('eventSelect');
+      input.value = topic;
+      input.focus();
+    }
+
+    // 미식별 건수 뱃지 업데이트
+    function updateBadges() {
+      const pendingCount = feedbacks.filter(f => !f.isReviewed).length;
+      const badge = document.getElementById('badgeCount');
+      if (pendingCount > 0) {
+        badge.textContent = pendingCount;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+
+    // 보고서 생성 모달
+    function openExportModal() {
+      document.getElementById('exportModal').classList.remove('hidden');
+      generateReportText();
+      lucide.createIcons();
+    }
+
+    function closeExportModal() {
+      document.getElementById('exportModal').classList.add('hidden');
+    }
+
+    function generateReportText() {
+      const filterGroup = document.getElementById('exportGroupFilter').value;
+      const filtered = feedbacks.filter(item => {
+        if (!item.isReviewed || !item.refinedText) return false;
+        if (filterGroup !== 'ALL' && item.groupId !== filterGroup) return false;
+        return true;
+      });
+
+      document.getElementById('exportCountText').textContent = `정제 완료 ${filtered.length}건 반영`;
+
+      const targetGroupName = filterGroup === 'ALL' ? '청소년 사목 전체 공동체' : (TARGET_GROUPS.find(g => g.id === filterGroup)?.name || '');
+
+      let text = `=========================================\n`;
+      text += `✝️ [${targetGroupName}] 사목 피드백 & 결산 안내\n`;
+      text += `담당 사제: 보좌신부 식별 및 정제 완료본\n`;
+      text += `작성일시: ${new Date().toLocaleDateString('ko-KR')}\n`;
+      text += `=========================================\n\n`;
+      text += `본 내용은 1년 동안 수렴된 교사, 자모, 청년들의 의견을\n보좌신부가 사목적으로 묵상·정제하여 함께 나누는 제안입니다.\n\n`;
+
+      if (filtered.length === 0) {
+        text += `(선택된 단체의 식별 및 정제 완료된 피드백이 아직 없습니다. 에디터에서 정제문을 저장해주세요.)`;
+      } else {
+        // 그룹별로 묶어 표시
+        const grouped = {};
+        filtered.forEach(f => {
+          if (!grouped[f.groupName]) grouped[f.groupName] = [];
+          grouped[f.groupName].push(f);
+        });
+
+        for (const [grpName, items] of Object.entries(grouped)) {
+          text += `■ [${grpName}]\n`;
+          items.forEach((item, i) => {
+            text += `  ${i + 1}. [${item.event}]\n`;
+            text += `     ${item.refinedText.replace(/\n/g, '\n     ')}\n\n`;
+          });
+        }
+      }
+
+      text += `\n"너희는 서로 남의 짐을 져 주십시오. 그렇게 하여 그리스도의 법을 완수하십시오." (갈라 6,2)\n`;
+
+      document.getElementById('reportOutputArea').value = text;
+    }
+
+    function copyReportToClipboard() {
+      const area = document.getElementById('reportOutputArea');
+      area.select();
+      navigator.clipboard.writeText(area.value).then(() => {
+        const toastSpan = document.getElementById('copyToast');
+        toastSpan.style.opacity = '1';
+        setTimeout(() => {
+          toastSpan.style.opacity = '0';
+        }, 2000);
+      });
+    }
+
+    // 간단한 토스트 알림창
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg');
+      toastMsg.textContent = msg;
+      toast.classList.remove('translate-y-16', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-16', 'opacity-0');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
